@@ -9,6 +9,7 @@ using std::endl;
 
 CmdPlayer::CmdPlayer(uint8_t p = 0) {
     pid = p;
+    type = 0;
 }
 
 ChessPiece CmdPlayer::getNextPos(const ChessPad* pad) {
@@ -25,7 +26,7 @@ ChessPiece CmdPlayer::getNextPos(const ChessPad* pad) {
         else continue;
         cin >> x;
         if (cin.fail() || x < 1 || x > 15 || cy < 0 || cy >= 15) continue;
-        if (reason = pad->check(p = ChessPiece(pid, x-1, cy))) {
+        if (reason = pad->check(p.set(pid, x-1, cy))) {
             infoFailed(p, reason);
         }
         else return p;

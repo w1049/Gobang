@@ -10,6 +10,7 @@ public:
     ChessPiece getNextPos(const ChessPad*);
 private:
     uint8_t pad[15][15];
+    int f();
 };
 
 #endif

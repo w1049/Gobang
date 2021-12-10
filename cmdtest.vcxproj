@@ -19,14 +19,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AIPlayer.cpp" />
     <ClCompile Include="ChessPad.cpp" />
     <ClCompile Include="ChessPiece.cpp" />
     <ClCompile Include="CmdGame.cpp" />
     <ClCompile Include="CmdPlayer.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AIPlayer.h" />
     <ClInclude Include="ChessPad.h" />
     <ClInclude Include="ChessPiece.h" />
     <ClInclude Include="CmdGame.h" />

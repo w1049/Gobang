@@ -3,6 +3,7 @@
 
 #include "CmdGame.h"
 #include "CmdPlayer.h"
+#include "AIPlayer.h"
 
 using std::cin;
 using std::cout;
@@ -10,13 +11,29 @@ using std::endl;
 
 void CmdGame::gameInit() {
     chessPad = new ChessPad;
-    p[0] = new CmdPlayer(1);
-    p[1] = new CmdPlayer(2);
+    cout << "1：人机\n2：机人\n其他：人人" << endl;
+    char x = cin.get();
+    if (x == '1') {
+        p[0] = new CmdPlayer(1);
+        p[1] = new AIPlayer(2);
+    } else if (x == '2') {
+        p[0] = new AIPlayer(1);
+        p[1] = new CmdPlayer(2);
+    } else {
+        p[0] = new CmdPlayer(1);
+        p[1] = new CmdPlayer(2);
+    }
     mode = 0;
 }
 
 void CmdGame::infoGameOver(uint8_t pid) {
-    cout << "玩家" << (int)pid << "赢了! " << endl;
+    cout << (pid == 1 ? "●" : "○");
+    if (p[pid - 1]->getType() == 0) {
+        cout << "玩家" << (int)pid << "赢了! " << endl;
+    } else {
+        cout << "电脑赢了！" << endl;
+    }
+    
 } // 提示游戏结束，展示胜者或平局
 
 const char* toS(uint8_t x) {

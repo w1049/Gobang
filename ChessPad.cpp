@@ -59,6 +59,10 @@ uint8_t ChessPad::p(uint8_t i, uint8_t j) const {
     return pad[i][j];
 }
 
+void ChessPad::writePad(uint8_t p[15][15]) const {
+    memcpy(p, pad, sizeof(pad));
+}
+
 ChessPad::ChessPad() {
     memset(pad, 0, sizeof(pad));
 }

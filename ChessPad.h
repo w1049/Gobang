@@ -20,6 +20,7 @@ public:
     uint8_t judge(ChessPiece) const;
     // 判断下完该棋子后是否胜利. 返回值为0表示不胜利，1表示胜利，2表示平局.
     uint8_t p(uint8_t, uint8_t) const;
+    void writePad(uint8_t[15][15]) const;
 };
 
 #endif

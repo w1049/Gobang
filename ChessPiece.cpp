@@ -8,3 +8,8 @@ uint8_t ChessPiece::getPid() { return pid; }
 uint8_t ChessPiece::getPosX() { return posX; }
 
 uint8_t ChessPiece::getPosY() { return posY; }
+
+ChessPiece& ChessPiece::set(uint8_t p, uint8_t x, uint8_t y) {
+    pid = p, posX = x, posY = y;
+    return *this;
+}

@@ -17,6 +17,7 @@ public:
     uint8_t getPid();
     uint8_t getPosX();
     uint8_t getPosY();
+    ChessPiece& set(uint8_t, uint8_t, uint8_t);
 };
 
 #endif
