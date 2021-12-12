@@ -12,7 +12,7 @@
 uint8_t ChessPad::place(ChessPiece p) {
     pad[p.getPosX()][p.getPosY()] = p.getPid();
     //pid=1先手,pid=2后手.
-    piece[p.getPid()-1].push(p);
+    piece[p.getPid()-1].push_back(p);
     return 0;
 }
 
@@ -63,6 +63,12 @@ void ChessPad::writePad(uint8_t p[15][15]) const {
     memcpy(p, pad, sizeof(pad));
 }
 
+const std::vector<ChessPiece>& ChessPad::getPiece(int i) const {
+    return piece[i];
+}
+
 ChessPad::ChessPad() {
     memset(pad, 0, sizeof(pad));
+    piece[0].clear();
+    piece[1].clear();
 }

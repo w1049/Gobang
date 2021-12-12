@@ -1,14 +1,14 @@
 #ifndef __CHESS_PAD_H__
 #define __CHESS_PAD_H__
 
-#include <stack>
+#include <vector>
 
 #include "ChessPiece.h"
 
 class ChessPad {
 private:
     uint8_t pad[15][15]; // 棋盘
-    std::stack<ChessPiece> piece[2]; // 棋子; 下棋顺序
+    std::vector<ChessPiece> piece[2]; // 棋子; 下棋顺序
     uint8_t isBanned(ChessPiece) const;
     uint8_t check45(ChessPiece, int8_t, int8_t) const;
 public:
@@ -21,6 +21,7 @@ public:
     // 判断下完该棋子后是否胜利. 返回值为0表示不胜利，1表示胜利，2表示平局.
     uint8_t p(uint8_t, uint8_t) const;
     void writePad(uint8_t[15][15]) const;
+    const std::vector<ChessPiece>& getPiece(int) const;
 };
 
 #endif
