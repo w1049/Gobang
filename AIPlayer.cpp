@@ -26,36 +26,39 @@ ChessPiece AIPlayer::getNextPos(const ChessPad* chessPad) {
 //        infoFailed(p, reason);
     int maxVal = -1E9-7, tmp;
     getVec(chessPad);
+	chessPad->writePad(pad);
     for (auto p : vec) {
-        //pad[p.getPosX()][p.getPosY()] = pid;
-        tmp = f(pid, chessPad);
-        // std::cerr << (int)p.getPosX() << "," << (int)p.getPosY() << ":" << tmp << std::endl;
+        pad[p.getPosX()][p.getPosY()] = pid;
+        tmp = f(pid, chessPad) - f(3 - pid, chessPad);
+        std::cerr << (int)p.getPosX() << "," << (int)p.getPosY() << ":" << tmp << std::endl;
         if ((tmp) > maxVal) {
             maxVal = tmp;
             maxP = p;
         }
-        //pad[p.getPosX()][p.getPosY()] = 0;
+        pad[p.getPosX()][p.getPosY()] = 0;
     }
     return maxP;
 }
 
 int AIPlayer::f(uint8_t pid, const ChessPad* chessPad) {
-	auto& myp = chessPad->getPiece(pid - 1), & hsp = chessPad->getPiece(2 - pid);
+	auto& myp = chessPad->getPiece(pid - 1);
 	int typenum[11] = {}, ret = 0;
+	uint8_t rec[15][15][4] = {};
+	memset(rec, 0, sizeof(rec));
 	for (auto p : myp) {
 		memset(typenum, 0, sizeof(typenum));
-		for (int i = 0; i < 4; i++)
-			getLine(p, i), ++typenum[getType()];
+		for (int i = 0; i < 4; i++) {
+			++typenum[getType(p, i)];
+		}
 		ret += getScores(typenum);
 	}
-	
-	for (auto p : hsp) {
-		memset(typenum, 0, sizeof(typenum));
-		for (int i = 0; i < 4; i++)
-			getLine(p, i), ++typenum[getType()];
-		ret -= getScores(typenum);
-	}
     return ret;
+}
+
+int AIPlayer::getType(ChessPiece p, int8_t direc) {
+	getLine(p, direc);
+	if (rec[p.getPosX()][p.getPosY()][direc]) return rec[p.getPosX()][p.getPosY()][direc];
+	else return getType();
 }
 
 void AIPlayer::getLine(ChessPiece p, int8_t direc) {
