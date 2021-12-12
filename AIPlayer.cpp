@@ -22,7 +22,6 @@ void AIPlayer::getVec(const ChessPad* chessPad) {
 int types[11];
 
 ChessPiece AIPlayer::getNextPos(const ChessPad* chessPad) {
-    if (chessPad->getPiece(pid - 1).size() == 0 && chessPad->getPiece(2 - pid).size() == 0) return ChessPiece(pid, 7, 7);
     ChessPiece maxP(pid, 0, 0);
     int maxVal = -1E9-7, tmp;
     getVec(chessPad);
@@ -30,46 +29,39 @@ ChessPiece AIPlayer::getNextPos(const ChessPad* chessPad) {
     for (auto p : vec) {
         pad[p.getPosX()][p.getPosY()] = pid;
         int a, b;
-        tmp = g(pid, chessPad, a, b);
+        tmp = g(pid, chessPad, a, b) + 14 - abs(p.getPosX() - 7) - abs(p.getPosY() - 7);
         std::cerr << (int)p.getPosX() << "," << (int)p.getPosY() << ":" << tmp << "|" << a << "vs" << b << std::endl;
         if (tmp > maxVal) {
             maxVal = tmp;
             maxP = p;
-        } else if (tmp == maxVal) {
-            int a = abs(p.getPosX() - 7) + abs(p.getPosY() - 7);
-            int b = abs(maxP.getPosX() - 7) + abs(maxP.getPosY() - 7);
-            if (b < a) {
-                maxVal = tmp;
-                maxP = p;
-            }
         }
         pad[p.getPosX()][p.getPosY()] = 0;
     }
     return maxP;
 }
 
-const int sc[11] = { 100000, 10000, 500, 400, 100, 90, 5, 10, 9, 2, 0 };
+const int sc[11] = { 1000000, 100000, 5000, 4000, 1000, 900, 50, 100, 90, 20, 0 };
 
 int AIPlayer::g(uint8_t pid, const ChessPad* chessPad, int &a, int &b) {
     int typ1[11] = {}, typ2[11] = {};
     a = f(pid, chessPad, typ1), b = f(3 - pid, chessPad, typ2);
-    int ret = a - b;
     int die4 = typ2[DIE4] + typ2[LOWDIE4];
     int alive3 = typ2[ALIVE3] + typ2[TIAO3];
     if (typ2[ALIVE4] || die4 >= 2 || die4 && alive3 || alive3 >= 2) {
         die4 = typ1[DIE4] + typ1[LOWDIE4];
         alive3 = typ1[ALIVE3] + typ1[TIAO3];
-        if (die4 >= 2 || die4 && alive3) ret -= 10000;// 双死4 死4活3
-        if (alive3 >= 2) ret -= 5000;// 双活3
-        ret -= typ1[ALIVE4] * sc[ALIVE4];
+        if (die4 >= 2 || die4 && alive3) b += 10000;// 双死4 死4活3
+        if (alive3 >= 2) b += 5000;// 双活3
+        a -= typ1[ALIVE4] * sc[ALIVE4];
     }
-    return ret;
+//    std::cerr << "AAA:" << alive3 << std::endl;
+    return a - b;
 }
 
 int AIPlayer::f(uint8_t pid, const ChessPad* chessPad, int types[11]) {
 	auto& myp = chessPad->getPiece(pid - 1);
 	int typenum[11] = {}, ret = 0, t;
-	uint8_t rec[15][15][4] = {};
+//	uint8_t rec[15][15][4] = {};
 	memset(rec, 0, sizeof(rec));
 	for (auto p : myp) {
 		memset(typenum, 0, sizeof(typenum));
@@ -89,9 +81,9 @@ int AIPlayer::f(uint8_t pid, const ChessPad* chessPad, int types[11]) {
 }
 
 int AIPlayer::getType(ChessPiece p, int8_t direc) {
-	getLine(p, direc);
 	if (rec[p.getPosX()][p.getPosY()][direc]) return rec[p.getPosX()][p.getPosY()][direc];
-	else return getType();
+    getLine(p, direc); 
+    return getType();
 }
 
 void AIPlayer::getLine(ChessPiece p, int8_t direc) {
@@ -192,6 +184,8 @@ int AIPlayer::getType() {
             if (line[r + 1] == pid && !line[r + 2] || line[l - 1] == pid && !line[l - 2])
                 return TIAO3;  //跳活3
                                //其他情况在下边返回NOTHREAT
+            if (!line[l - 1] && line[r + 1] == hid || line[l - 1] == hid && !line[r + 1])
+                return LOWALIVE2;
         }
         else if (cl == hid && cr == hid) {  //两边断开位置均非空
             return NOTHREAT;
