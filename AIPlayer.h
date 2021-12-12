@@ -16,12 +16,13 @@ private:
     uint8_t line[9];
     void getVec(const ChessPad*);
     std::vector<ChessPiece> vec;
-    int f(uint8_t, const ChessPad*);
+    int f(uint8_t, const ChessPad*, int[11]);
+    int g(uint8_t, const ChessPad*, int&, int&);
     int getType(ChessPiece p, int8_t direc);
     void getLine(ChessPiece, int8_t);
     void getLine(ChessPiece, int8_t, int8_t);
     int getType();
-    int getScores(int[]);
+    int getExScore(int[]);
 };
 
 #endif
