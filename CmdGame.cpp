@@ -53,7 +53,7 @@ void CmdGame::displayPad() {
     }
 }
 void CmdGame::refreshPad(ChessPiece p) {
-    system("cls");
+    //system("cls");
     cout << "   A  B  C  D  E  F  G  H  I  J  K  L  M  N  O" << endl;
     for (uint8_t i = 0; i < 15; i++) {
         cout << std::setw(2) << (int)(i + 1) << " ";
