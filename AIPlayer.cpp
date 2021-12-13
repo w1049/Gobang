@@ -11,15 +11,7 @@ const int kk[10] = { 5, 4, 4, 4, 3, 3, 3, 2, 2, 2 };
 AIPlayer::AIPlayer(int8_t p = 0) {
     pid = p;
     type = 1;
-    depth = 1;
-}
-
-void AIPlayer::getVec(const ChessPad& chessPad) {
-    ChessPiece p;
-    vec.clear();
-    for (int8_t x = 0; x < 15; x++)
-        for (int8_t y = 0; y < 15; y++)
-            if (!chessPad.check(p.set(pid, x, y))) vec.push_back(p);
+    depth = 2;
 }
 
 void AIPlayer::generate(const ChessPad& chessPad, cpv &v, int8_t pid) {
@@ -50,13 +42,14 @@ ChessPiece AIPlayer::getNextPos(const ChessPad& oriChessPad) {
     ChessPiece maxP(pid, 0, 0);
     int maxVal = -1E9-8, tmp;
     ChessPad chessPad(oriChessPad);
+    cpv vec;
     generate(chessPad, vec, pid);
     for (auto p : vec) {
         chessPad.place(p);
         //tmp = g(pid, chessPad); // + 14 - abs(p.getPosX() - 7) - abs(p.getPosY() - 7);
         tmp = dfs(0, chessPad, pid);
         chessPad.remove(p.getPid());
-        std::cerr << (int)p.getPosX() << "," << (int)p.getPosY() << ":" << tmp << "|" << a << "vs" << b << std::endl;
+        //std::cerr << (int)p.getPosX() << "," << (int)p.getPosY() << ":" << tmp << "|" << a << "vs" << b << std::endl;
         if (tmp > maxVal) {
             maxVal = tmp;
             maxP = p;
@@ -127,16 +120,13 @@ int AIPlayer::dfs(int d, ChessPad &pad, int8_t pid) {
     cpv vec;
     generate(pad, vec, pid);
     // std::cerr << "VECSIZZE:" << vec.size() << std::endl;
-    int mxRes;
-    if (pid == this->pid) mxRes = -1e9 - 7;
-    else mxRes = 1e9 + 7;
+    int mxRes = -1e9 - 7;
     for (auto p : vec) {
         // std::cerr << (int)p.getPosX() << "place" << (int)p.getPosY() << std::endl;
         pad.place(p);
         int res = dfs(d + 1, pad, 3 - pid);
         pad.remove(p.getPid());
-        if (pid == this->pid && res > mxRes) mxRes = res;
-        else if (pid != this->pid && res < mxRes) mxRes = res;
+        if (res > mxRes) mxRes = res;
     }
-    return mxRes;
+    return -mxRes;
 }
