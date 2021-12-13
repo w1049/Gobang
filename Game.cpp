@@ -11,7 +11,7 @@ void Game::gameMain() {
     ChessPiece tmp(0,0,0);
     uint8_t code, i = 1;
     while (1) {
-        tmp = p[i-1]->getNextPos(chessPad);
+        tmp = p[i-1]->getNextPos(*chessPad);
         chessPad->place(tmp);
         refreshPad(tmp);
         code = chessPad->judge(tmp);

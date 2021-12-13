@@ -14,25 +14,25 @@ AIPlayer::AIPlayer(uint8_t p = 0) {
     depth = 5;
 }
 
-void AIPlayer::getVec(const ChessPad* chessPad) {
+void AIPlayer::getVec(const ChessPad& chessPad) {
     ChessPiece p;
     vec.clear();
     for (uint8_t x = 0; x < 15; x++)
         for (uint8_t y = 0; y < 15; y++)
-            if (!chessPad->check(p.set(pid, x, y))) vec.push_back(p);
+            if (!chessPad.check(p.set(pid, x, y))) vec.push_back(p);
 }
 
-void AIPlayer::generate(const ChessPad* chessPad, cpv &v) {
+void AIPlayer::generate(const ChessPad& chessPad, cpv &v) {
     uint8_t pad[15][15] = {};
     v.clear();
     for (int k = 0; k <= 1; k++) {
-        auto& plist = chessPad->getPiece(k);
+        auto& plist = chessPad.getPiece(k);
         if (plist.empty()) pad[7][7] = 1;
         for (auto p : plist) {
             for (int8_t i = -2; i <= 2; i++)
                 for (int8_t j = -2; j <= 2; j++) {
                     uint8_t x = p.getPosX() + i, y = p.getPosY() + j;
-                    if (!chessPad->check(ChessPiece(pid, x, y)) && !pad[x][y])
+                    if (!chessPad.check(ChessPiece(pid, x, y)) && !pad[x][y])
                         pad[x][y] = 1;
                 }
         }
@@ -45,7 +45,7 @@ void AIPlayer::generate(const ChessPad* chessPad, cpv &v) {
 
 int types[11];
 
-ChessPiece AIPlayer::getNextPos(const ChessPad* chessPad) {
+ChessPiece AIPlayer::getNextPos(const ChessPad& chessPad) {
     ChessPiece maxP(pid, 0, 0);
     int maxVal = -1E9-7, tmp;
     generate(chessPad, vec);
@@ -61,7 +61,7 @@ ChessPiece AIPlayer::getNextPos(const ChessPad* chessPad) {
     return maxP;
 }
 
-int AIPlayer::g(uint8_t pid, const ChessPad* chessPad, int &a, int &b, ChessPiece p) {
+int AIPlayer::g(uint8_t pid, const ChessPad& chessPad, int &a, int &b, ChessPiece p) {
     int typ1[11] = {}, typ2[11] = {};
     a = f(pid, chessPad, typ1, p), b = f(3 - pid, chessPad, typ2, p);
     int die4 = typ2[DIE4] + typ2[LOWDIE4];
@@ -80,14 +80,14 @@ int AIPlayer::g(uint8_t pid, const ChessPad* chessPad, int &a, int &b, ChessPiec
     return a - b;
 }
 
-int AIPlayer::f(uint8_t pid, const ChessPad* chessPad, int types[11], ChessPiece extra) {
-	auto &myp = chessPad->getPiece(pid - 1);
+int AIPlayer::f(uint8_t pid, const ChessPad& chessPad, int types[11], ChessPiece extra) {
+	auto &myp = chessPad.getPiece(pid - 1);
 	int typenum[11] = {}, ret = 0, t;
 //	uint8_t rec[15][15][4] = {};
 	for (auto p : myp) {
 		memset(typenum, 0, sizeof(typenum));
 		for (int i = 0; i < 4; i++) {
-            t = chessPad->getType(p, i, extra);
+            t = chessPad.getType(p, i, extra);
 			++typenum[t], ++types[t];
 		}
 		ret += getExScore(typenum);
@@ -96,7 +96,7 @@ int AIPlayer::f(uint8_t pid, const ChessPad* chessPad, int types[11], ChessPiece
     if (extra.getPid() == pid) {
         memset(typenum, 0, sizeof(typenum));
         for (int i = 0; i < 4; i++) {
-            t = chessPad->getType(extra, i, extra);
+            t = chessPad.getType(extra, i, extra);
             ++typenum[t], ++types[t];
         }
         ret += getExScore(typenum);
@@ -124,6 +124,7 @@ int AIPlayer::getExScore(int typenum[]) {
     return 0;
 }
 
-void dfs(int d, uint8_t pad[15][15]) {
-
+void AIPlayer::dfs(int d, ChessPad &pad) {
+    cpv vec;
+    generate(pad, vec);
 }
