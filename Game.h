@@ -8,11 +8,11 @@ class Game {
 protected:
     ChessPad *chessPad;
     Player *p[2];
-    uint8_t mode;                   // 禁手规则. 0:无禁手; 1:有提示,禁止放置; 2:无提示,直接判负.
+    int8_t mode;                   // 禁手规则. 0:无禁手; 1:有提示,禁止放置; 2:无提示,直接判负.
 public:
     void gameMain();
     
-    virtual void infoGameOver(uint8_t pid) = 0; // 提示游戏结束，展示胜者或平局
+    virtual void infoGameOver(int8_t pid) = 0; // 提示游戏结束，展示胜者或平局
     virtual void displayPad() = 0; // 显示棋盘. 第一次显示棋盘时使用.
     virtual void refreshPad(ChessPiece) = 0; // 刷新棋盘. 仅改变个别棋子.
 };

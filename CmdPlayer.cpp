@@ -7,14 +7,14 @@ using std::cin;
 using std::cout;
 using std::endl;
 
-CmdPlayer::CmdPlayer(uint8_t p = 0) {
+CmdPlayer::CmdPlayer(int8_t p = 0) {
     pid = p;
     type = 0;
 }
 
 ChessPiece CmdPlayer::getNextPos(const ChessPad& pad) {
     ChessPiece p;
-    uint8_t reason;
+    int8_t reason;
     while (1) {
         cout << "轮到" << (pid == 1 ? "●" : "○") << "方下棋。请输入坐标，形式为“A8”\n（不含引号，若格式不对我也不知道会发生什么）: " << endl;
         char cy;
@@ -33,6 +33,6 @@ ChessPiece CmdPlayer::getNextPos(const ChessPad& pad) {
     }
 }
 
-void CmdPlayer::infoFailed(ChessPiece p, uint8_t reason) {
+void CmdPlayer::infoFailed(ChessPiece p, int8_t reason) {
     cout << "由于原因" << (int)reason << ", 你不能在" << char(p.getPosY() + 'A') << (int)p.getPosX() + 1 << "下棋." << endl;
 }

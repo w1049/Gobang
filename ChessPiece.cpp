@@ -1,15 +1,15 @@
 #include "ChessPiece.h"
 
-ChessPiece::ChessPiece(uint8_t pid = 0, uint8_t posX = 0, uint8_t posY = 0)
+ChessPiece::ChessPiece(int8_t pid = 0, int8_t posX = 0, int8_t posY = 0)
     : pid(pid), posX(posX), posY(posY) {}
 
-uint8_t ChessPiece::getPid() { return pid; }
+int8_t ChessPiece::getPid() { return pid; }
 
-uint8_t ChessPiece::getPosX() { return posX; }
+int8_t ChessPiece::getPosX() { return posX; }
 
-uint8_t ChessPiece::getPosY() { return posY; }
+int8_t ChessPiece::getPosY() { return posY; }
 
-ChessPiece& ChessPiece::set(uint8_t p, uint8_t x, uint8_t y) {
+ChessPiece& ChessPiece::set(int8_t p, int8_t x, int8_t y) {
     pid = p, posX = x, posY = y;
     return *this;
 }

@@ -7,7 +7,7 @@ enum ChessType { WIN5, ALIVE4, DIE4, LOWDIE4, ALIVE3, TIAO3, DIE3, ALIVE2, LOWAL
 const int8_t ChessPad::dx[4] = { 0, 1, 1, 1 }, ChessPad::dy[4] = { 1, 0, 1, -1 };
 
 // 下棋子. 不再判断是否合法. 调用前请先调用check. 禁手也可强行放置.(由Game类决定是否放置，这里只需实现放置).
-uint8_t ChessPad::place(ChessPiece p) {
+int8_t ChessPad::place(ChessPiece p) {
     pad[p.getPosX()][p.getPosY()] = p.getPid();
     //pid=1先手,pid=2后手.
     piece[p.getPid()-1].push_back(p);
@@ -15,15 +15,15 @@ uint8_t ChessPad::place(ChessPiece p) {
 }
 
 // 是否禁手
-uint8_t ChessPad::isBanned(ChessPiece p) const {
+int8_t ChessPad::isBanned(ChessPiece p) const {
     if (p.getPid() == 2) return 0;
     // 判断禁手并返回1
     return 0;
 }
 
 // 判断是否可以放置棋子. 返回值为0代表可以放置，1代表该位置已有棋子，2代表可以放置, 但禁手（暂不区分禁手原因），3代表出界.
-uint8_t ChessPad::check(ChessPiece p) const {
-    uint8_t x = p.getPosX(), y = p.getPosY();
+int8_t ChessPad::check(ChessPiece p) const {
+    int8_t x = p.getPosX(), y = p.getPosY();
     if (x < 0 || x >= 15 || y < 0 || y >= 15) return 3;
     if (pad[x][y]) return 1;
     if (isBanned(p)) return 2;
@@ -31,18 +31,24 @@ uint8_t ChessPad::check(ChessPiece p) const {
 }
 
 // 判断下完该棋子后是否胜利.（该棋子已下）返回值为0表示不胜利，1表示胜利，2表示平局.
-uint8_t ChessPad::judge(ChessPiece p) const {
+int8_t ChessPad::judge(ChessPiece p) const {
     for (int i = 0; i < 4; i++)
         if (getType(p, i) == WIN5) return 1;
     return 0;
 }
 
-uint8_t ChessPad::p(uint8_t i, uint8_t j) const {
+int8_t ChessPad::p(int8_t i, int8_t j) const {
     return pad[i][j];
 }
 
 const std::vector<ChessPiece>& ChessPad::getPiece(int i) const {
     return piece[i];
+}
+
+void ChessPad::remove(int8_t pid) {
+    ChessPiece p = piece[pid - 1].back();
+    piece[pid - 1].pop_back();
+    pad[p.getPosX()][p.getPosY()] = 0;
 }
 
 ChessPad::ChessPad() {
@@ -51,10 +57,17 @@ ChessPad::ChessPad() {
     piece[1].clear();
 }
 
-int ChessPad::getType(ChessPiece p, int8_t direc, ChessPiece extra) const {
+ChessPad::ChessPad(const ChessPad& p) {
+    piece[0] = p.piece[0];
+    piece[1] = p.piece[1];
+    memcpy(pad, p.pad, sizeof(pad));
+    // std::cerr << "COPY\n";
+}
+
+int ChessPad::getType(ChessPiece p, int8_t direc) const {
     // if (rec[p.getPosX()][p.getPosY()][direc]) return rec[p.getPosX()][p.getPosY()][direc];
-    uint8_t line[9] = {};
-    getLine(p, direc, line, extra);
+    int8_t line[9] = {};
+    getLine(p, direc, line);
     int re = getType(line);
 //    std::cerr << re << " ";
 //    for (int i = 0; i < 9; i++) std::cerr << (int)line[i] << ",";
@@ -62,33 +75,27 @@ int ChessPad::getType(ChessPiece p, int8_t direc, ChessPiece extra) const {
     return re;
 }
 
-void ChessPad::getLine(ChessPiece p, int8_t direc, uint8_t line[9], ChessPiece extra) const {
+void ChessPad::getLine(ChessPiece p, int8_t direc, int8_t line[9]) const {
     int8_t dx = ChessPad::dx[direc], dy = ChessPad::dy[direc];
     int8_t x = p.getPosX(), y = p.getPosY();
-    uint8_t pid = p.getPid(), cnt = 1;
+    int8_t pid = p.getPid(), cnt = 1;
     line[4] = pid;
     x += dx, y += dy;
     for (int8_t c = 5; c < 9; c++)
-        if (x >= 0 && x < 15 && y >= 0 && y < 15) {
-            if (extra.getPid() && x == extra.getPosX() && y == extra.getPosY()) line[c] = extra.getPid();
-            else line[c] = pad[x][y];
-            x += dx, y += dy;
-        }
+        if (x >= 0 && x < 15 && y >= 0 && y < 15)
+           line[c] = pad[x][y], x += dx, y += dy;
         else line[c] = 3 - pid;
     x = p.getPosX(), y = p.getPosY();
     x -= dx, y -= dy;
     for (int8_t c = 3; c >= 0; c--)
-        if (x >= 0 && x < 15 && y >= 0 && y < 15) {
-            if (extra.getPid() && x == extra.getPosX() && y == extra.getPosY()) line[c] = extra.getPid();
-            else line[c] = pad[x][y];
-            x -= dx, y -= dy;
-        }
+        if (x >= 0 && x < 15 && y >= 0 && y < 15)
+            line[c] = pad[x][y], x -= dx, y -= dy;
         else line[c] = 3 - pid;
 }
 
 // 旗形判断参考：https://www.cnblogs.com/songdechiu/p/5768999.html
 
-int ChessPad::getType(uint8_t line[9]) const {
+int ChessPad::getType(int8_t line[9]) const {
     int pid = line[4];
     int hid = 3 - pid;
     int l, r;     //开始和中心线断开的位置

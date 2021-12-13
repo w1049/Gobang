@@ -1,6 +1,8 @@
 #ifndef __CHESS_PIECE_H__
 #define __CHESS_PIECE_H__
 
+#include <vector>
+
 typedef unsigned char uint8_t;
 typedef signed char int8_t;
 typedef unsigned short uint16_t;
@@ -8,16 +10,18 @@ typedef unsigned int uint32_t;
 
 class ChessPiece {
 private:
-    uint8_t pid;
-    uint8_t posX;
-    uint8_t posY;
+    int8_t pid;
+    int8_t posX;
+    int8_t posY;
 public:
     ChessPiece() = default;
-    ChessPiece(uint8_t, uint8_t, uint8_t);
-    uint8_t getPid();
-    uint8_t getPosX();
-    uint8_t getPosY();
-    ChessPiece& set(uint8_t, uint8_t, uint8_t);
+    ChessPiece(int8_t, int8_t, int8_t);
+    int8_t getPid();
+    int8_t getPosX();
+    int8_t getPosY();
+    ChessPiece& set(int8_t, int8_t, int8_t);
 };
+
+typedef std::vector<ChessPiece> cpv;
 
 #endif

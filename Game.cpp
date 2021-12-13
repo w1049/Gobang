@@ -4,12 +4,12 @@
 
     // ChessPad *chessPad;
     // Player *p[2];
-    // uint8_t mode; // 禁手规则. 0:无禁手; 1:有提示,禁止放置; 2:无提示,直接判负.
+    // int8_t mode; // 禁手规则. 0:无禁手; 1:有提示,禁止放置; 2:无提示,直接判负.
 
 void Game::gameMain() {
     displayPad();
     ChessPiece tmp(0,0,0);
-    uint8_t code, i = 1;
+    int8_t code, i = 1;
     while (1) {
         tmp = p[i-1]->getNextPos(*chessPad);
         chessPad->place(tmp);
@@ -23,8 +23,8 @@ void Game::gameMain() {
     }
 }
     
-    // virtual infoGameOver(uint8_t pid) = 0; // 提示游戏结束，展示胜者或平局
-    // virtual infoPlaceFailed(ChessPiece, uint8_t reason) = 0; // 提示无法放置棋子
+    // virtual infoGameOver(int8_t pid) = 0; // 提示游戏结束，展示胜者或平局
+    // virtual infoPlaceFailed(ChessPiece, int8_t reason) = 0; // 提示无法放置棋子
     // virtual displayPad() = 0; // 显示棋盘. 第一次显示棋盘时使用.
     // virtual refreshPad() = 0; // 刷新棋盘. 仅改变个别棋子.
 

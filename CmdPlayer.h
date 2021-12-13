@@ -6,9 +6,9 @@
 
 class CmdPlayer : public Player {
 public:
-    CmdPlayer(uint8_t);
+    CmdPlayer(int8_t);
     ChessPiece getNextPos(const ChessPad&);
-    void infoFailed(ChessPiece, uint8_t);
+    void infoFailed(ChessPiece, int8_t);
 };
 
 #endif
