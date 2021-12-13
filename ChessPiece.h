@@ -8,9 +8,9 @@ typedef unsigned int uint32_t;
 
 class ChessPiece {
 private:
-    uint8_t pid:2;
-    uint8_t posX:7;
-    uint8_t posY:7;
+    uint8_t pid;
+    uint8_t posX;
+    uint8_t posY;
 public:
     ChessPiece() = default;
     ChessPiece(uint8_t, uint8_t, uint8_t);

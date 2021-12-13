@@ -11,7 +11,9 @@ const int kk[10] = { 5, 4, 4, 4, 3, 3, 3, 2, 2, 2 };
 AIPlayer::AIPlayer(uint8_t p = 0) {
     pid = p;
     type = 1;
+    depth = 5;
 }
+
 void AIPlayer::getVec(const ChessPad* chessPad) {
     ChessPiece p;
     vec.clear();
@@ -20,12 +22,33 @@ void AIPlayer::getVec(const ChessPad* chessPad) {
             if (!chessPad->check(p.set(pid, x, y))) vec.push_back(p);
 }
 
+void AIPlayer::generate(const ChessPad* chessPad, cpv &v) {
+    uint8_t pad[15][15] = {};
+    v.clear();
+    for (int k = 0; k <= 1; k++) {
+        auto& plist = chessPad->getPiece(k);
+        if (plist.empty()) pad[7][7] = 1;
+        for (auto p : plist) {
+            for (int8_t i = -2; i <= 2; i++)
+                for (int8_t j = -2; j <= 2; j++) {
+                    uint8_t x = p.getPosX() + i, y = p.getPosY() + j;
+                    if (!chessPad->check(ChessPiece(pid, x, y)) && !pad[x][y])
+                        pad[x][y] = 1;
+                }
+        }
+    }
+    for (uint8_t x = 0; x < 15; x++)
+        for (uint8_t y = 0; y < 15; y++)
+            if (pad[x][y]) vec.push_back(ChessPiece(pid, x, y));
+}
+
+
 int types[11];
 
 ChessPiece AIPlayer::getNextPos(const ChessPad* chessPad) {
     ChessPiece maxP(pid, 0, 0);
     int maxVal = -1E9-7, tmp;
-    getVec(chessPad);
+    generate(chessPad, vec);
     for (auto p : vec) {
         int a, b;
         tmp = g(pid, chessPad, a, b, p) + 14 - abs(p.getPosX() - 7) - abs(p.getPosY() - 7);
@@ -58,7 +81,7 @@ int AIPlayer::g(uint8_t pid, const ChessPad* chessPad, int &a, int &b, ChessPiec
 }
 
 int AIPlayer::f(uint8_t pid, const ChessPad* chessPad, int types[11], ChessPiece extra) {
-	auto& myp = chessPad->getPiece(pid - 1);
+	auto &myp = chessPad->getPiece(pid - 1);
 	int typenum[11] = {}, ret = 0, t;
 //	uint8_t rec[15][15][4] = {};
 	for (auto p : myp) {
@@ -99,4 +122,8 @@ int AIPlayer::getExScore(int typenum[]) {
     //if (alive3 >= 2) return 5000;//双活3
     //if (typenum[DIE3] && typenum[ALIVE3]) return 2000;//死3高级活3
     return 0;
+}
+
+void dfs(int d, uint8_t pad[15][15]) {
+
 }

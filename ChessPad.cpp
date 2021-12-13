@@ -5,10 +5,6 @@
 
 enum ChessType { WIN5, ALIVE4, DIE4, LOWDIE4, ALIVE3, TIAO3, DIE3, ALIVE2, LOWALIVE2, DIE2, NOTHREAT };
 const int8_t ChessPad::dx[4] = { 0, 1, 1, 1 }, ChessPad::dy[4] = { 1, 0, 1, -1 };
-// class ChessPad {
-// private:
-//     uint8_t pad[15][15]; // 棋盘
-//     std::stack<ChessPiece> piece[2]; // 棋子; 下棋顺序
 
 // 下棋子. 不再判断是否合法. 调用前请先调用check. 禁手也可强行放置.(由Game类决定是否放置，这里只需实现放置).
 uint8_t ChessPad::place(ChessPiece p) {
