@@ -1,6 +1,6 @@
-#include <stack>
+#include <vector>
 #include <cstring>
-
+#include <iostream>
 #include "ChessPad.h"
 
 enum ChessType { WIN5, ALIVE4, DIE4, LOWDIE4, ALIVE3, TIAO3, DIE3, ALIVE2, LOWALIVE2, DIE2, NOTHREAT };
@@ -45,10 +45,6 @@ uint8_t ChessPad::p(uint8_t i, uint8_t j) const {
     return pad[i][j];
 }
 
-void ChessPad::writePad(uint8_t p[15][15]) const {
-    memcpy(p, pad, sizeof(pad));
-}
-
 const std::vector<ChessPiece>& ChessPad::getPiece(int i) const {
     return piece[i];
 }
@@ -63,7 +59,11 @@ int ChessPad::getType(ChessPiece p, int8_t direc, ChessPiece extra) const {
     // if (rec[p.getPosX()][p.getPosY()][direc]) return rec[p.getPosX()][p.getPosY()][direc];
     uint8_t line[9] = {};
     getLine(p, direc, line, extra);
-    return getType(line);
+    int re = getType(line);
+//    std::cerr << re << " ";
+//    for (int i = 0; i < 9; i++) std::cerr << (int)line[i] << ",";
+//    std::cerr << std::endl;
+    return re;
 }
 
 void ChessPad::getLine(ChessPiece p, int8_t direc, uint8_t line[9], ChessPiece extra) const {
@@ -74,7 +74,7 @@ void ChessPad::getLine(ChessPiece p, int8_t direc, uint8_t line[9], ChessPiece e
     x += dx, y += dy;
     for (int8_t c = 5; c < 9; c++)
         if (x >= 0 && x < 15 && y >= 0 && y < 15) {
-            if (x == extra.getPosX() && y == extra.getPosY()) line[c] = extra.getPid();
+            if (extra.getPid() && x == extra.getPosX() && y == extra.getPosY()) line[c] = extra.getPid();
             else line[c] = pad[x][y];
             x += dx, y += dy;
         }
@@ -83,7 +83,7 @@ void ChessPad::getLine(ChessPiece p, int8_t direc, uint8_t line[9], ChessPiece e
     x -= dx, y -= dy;
     for (int8_t c = 3; c >= 0; c--)
         if (x >= 0 && x < 15 && y >= 0 && y < 15) {
-            if (x == extra.getPosX() && y == extra.getPosY()) line[c] = extra.getPid();
+            if (extra.getPid() && x == extra.getPosX() && y == extra.getPosY()) line[c] = extra.getPid();
             else line[c] = pad[x][y];
             x -= dx, y -= dy;
         }

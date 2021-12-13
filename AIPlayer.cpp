@@ -68,6 +68,16 @@ int AIPlayer::f(uint8_t pid, const ChessPad* chessPad, int types[11], ChessPiece
 		}
 		ret += getExScore(typenum);
 	}
+    // for extra
+    if (extra.getPid() == pid) {
+        memset(typenum, 0, sizeof(typenum));
+        for (int i = 0; i < 4; i++) {
+            t = chessPad->getType(extra, i, extra);
+            ++typenum[t], ++types[t];
+        }
+        ret += getExScore(typenum);
+    }
+    // for extra
     for (int i = 0; i < 10; i++) /*types[i] /= kk[i], */std::cerr << types[i] << " ";
     std::cerr << "\n";
     int die4 = types[DIE4] + types[LOWDIE4];

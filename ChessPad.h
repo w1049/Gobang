@@ -13,7 +13,7 @@ private:
     const static int8_t dx[4], dy[4];
 public:
     ChessPad();
-    int getType(ChessPiece p, int8_t direc, ChessPiece = { 0, 16, 16 }) const;
+    int getType(ChessPiece p, int8_t direc, ChessPiece = { 0, 0, 0 }) const;
     void getLine(ChessPiece p, int8_t direc, uint8_t[9], ChessPiece extra) const;
     int getType(uint8_t[9]) const;
     uint8_t place(ChessPiece);
@@ -23,7 +23,6 @@ public:
     uint8_t judge(ChessPiece) const;
     // 判断下完该棋子后是否胜利. 返回值为0表示不胜利，1表示胜利，2表示平局.
     uint8_t p(uint8_t, uint8_t) const;
-    void writePad(uint8_t[15][15]) const;
     const std::vector<ChessPiece>& getPiece(int) const;
 };
 
