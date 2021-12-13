@@ -11,7 +11,6 @@ public:
     AIPlayer(uint8_t);
     ChessPiece getNextPos(const ChessPad*);
 private:
-    uint8_t rec[15][15][4];
     void getVec(const ChessPad*);
     std::vector<ChessPiece> vec;
     int f(uint8_t, const ChessPad*, int[11], ChessPiece);
