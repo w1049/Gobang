@@ -13,7 +13,7 @@ private:
     int f(int8_t, const ChessPad&, int[11]);
     int g(int8_t, const ChessPad&);
     int getExScore(int[]);
-    int dfs(int d, ChessPad& pad, int8_t);
+    int dfs(ChessPiece&, int d, ChessPad& pad, int8_t, int = -1e9-7, int = 1e9 + 7);
     int depth;
     int a, b;
 };
