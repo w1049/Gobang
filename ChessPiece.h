@@ -20,6 +20,7 @@ public:
     int8_t getPosX();
     int8_t getPosY();
     ChessPiece& set(int8_t, int8_t, int8_t);
+    ChessPiece& setPid(int8_t p);
     bool operator<(const ChessPiece& p) const;
 };
 

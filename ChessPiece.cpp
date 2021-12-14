@@ -16,6 +16,11 @@ ChessPiece& ChessPiece::set(int8_t p, int8_t x, int8_t y) {
     return *this;
 }
 
+ChessPiece& ChessPiece::setPid(int8_t p) {
+    pid = p;
+    return *this;
+}
+
 bool ChessPiece::operator<(const ChessPiece& p) const {
     return abs(posX - 7) + abs(posY - 7) > abs(p.posX - 7) + abs(p.posY - 7);
 }

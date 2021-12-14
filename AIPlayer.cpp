@@ -14,6 +14,12 @@ AIPlayer::AIPlayer(int8_t p = 0) {
     pid = p;
     type = 1;
     depth = 7;
+    // TODO:
+    /* depth 应为奇数还是偶数
+     * 迭代加深
+     * 禁手
+    */
+    // is it necessary to set forced-scores in f&g?
 }
 
 typedef std::pair<int, ChessPiece> prc;
@@ -48,16 +54,54 @@ void AIPlayer::generate(ChessPad& chessPad, cpv &v, int8_t pid) {
     }
     if (empty == 2) pad[7][7] = 1;
     vprc vec;
+    cpv win5, valive4, vdie4, vdouble3, valive3;
+    cpv ualive4, udie4, udouble3, ualive3;
     ChessPiece p;
     for (int8_t x = 0; x < 15; x++)
         for (int8_t y = 0; y < 15; y++) {
+            if (!pad[x][y]) continue;
+
+            p.set(3 - pid, x, y);
+            int hiScore = evaluate(chessPad, p);
+            p.setPid(pid);
+            if (hiScore >= ss[WIN5]) win5.push_back(p);
+            else if (hiScore > ss[ALIVE4]) ualive4.push_back(p);
+            else if (hiScore > ss[DIE4]) udie4.push_back(p);
+            else if (hiScore > 2 * ss[ALIVE3]) udouble3.push_back(p);
+            else if (hiScore > ss[ALIVE3]) ualive3.push_back(p);
+
             p.set(pid, x, y);
-            if (pad[x][y]) vec.push_back({ -evaluate(chessPad, p), p });
+            int myScore = evaluate(chessPad, p);
+            if (myScore >= ss[WIN5]) win5.push_back(p);
+            else if (myScore > ss[ALIVE4]) valive4.push_back(p);
+            else if (myScore > ss[DIE4]) vdie4.push_back(p);
+            else if (myScore > 2 * ss[ALIVE3]) vdouble3.push_back(p);
+            else if (myScore > ss[ALIVE3]) valive3.push_back(p);
+            else vec.push_back({ hiScore - myScore, p });
         }
-    sort(vec.begin(), vec.end());
-    int n = vec.size();// > 20 ? 20 : vec.size();
-    for (int i = 0; i < n; i++)
-        v.push_back(vec[i].second);
+
+    if (!win5.empty()) v = win5;
+    else if (!valive4.empty()) v = valive4;
+    else if (!ualive4.empty() && vdie4.empty()) v = ualive4;
+    else if (!ualive4.empty()) {
+        v = ualive4;
+        v.insert(v.end(), vdie4.begin(), vdie4.end());
+        v.insert(v.end(), udie4.begin(), udie4.end());
+    } else {
+        v = vdouble3;
+        v.insert(v.end(), udouble3.begin(), udouble3.end());
+        v.insert(v.end(), vdie4.begin(), vdie4.end());
+        v.insert(v.end(), udie4.begin(), udie4.end());
+        v.insert(v.end(), valive3.begin(), valive3.end());
+        v.insert(v.end(), ualive3.begin(), ualive3.end());
+        if (!udouble3.empty() || !vdouble3.empty());
+        else {
+            sort(vec.begin(), vec.end());
+            int n = vec.size() > 12 ? 12 : vec.size();
+            for (int i = 0; i < n; i++)
+                v.push_back(vec[i].second);
+        }
+    }
 }
 
 
