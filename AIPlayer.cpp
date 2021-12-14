@@ -1,21 +1,37 @@
 #include <cstring>
 #include <iostream>
-#include <cmath>
+#include <algorithm>
 #include "AIPlayer.h"
 #include "ChessPiece.h"
 using std::ostream;
 
 enum ChessType { WIN5, ALIVE4, DIE4, LOWDIE4, ALIVE3, TIAO3, DIE3, ALIVE2, LOWALIVE2, DIE2, NOTHREAT };
 const int sc[11] = { 100, 60, 60, 50, 60, 16, 12, 13, 5, 3, 0 };
+const int ss[11] = { 100000, 10000, 1000, 1000, 100, 100, 10, 10, 1, 0 };
 const int kk[10] = { 5, 4, 4, 4, 3, 3, 3, 2, 2, 2 };
 
 AIPlayer::AIPlayer(int8_t p = 0) {
     pid = p;
     type = 1;
-    depth = 3;
+    depth = 7;
 }
 
-void AIPlayer::generate(const ChessPad& chessPad, cpv &v, int8_t pid) {
+typedef std::pair<int, ChessPiece> prc;
+typedef std::vector<prc> vprc;
+
+int AIPlayer::evaluate(ChessPad& pad, ChessPiece p) {
+    int typ[11] = {}, ret = 0;
+    pad.place(p);
+    for (int i = 0; i < 4; i++)
+        ++typ[pad.getType(p, i)];
+    pad.remove(p.getPid());
+    for (int i = 0; i < 11; i++)
+        ret += typ[i] * ss[i];
+    return ret;
+}
+
+// 上一次是 3 - pid 下的，现在为 pid 选择落点
+void AIPlayer::generate(ChessPad& chessPad, cpv &v, int8_t pid) {
     int8_t pad[15][15] = {}, empty = 0;
     v.clear();
     for (int k = 0; k <= 1; k++) {
@@ -31,9 +47,17 @@ void AIPlayer::generate(const ChessPad& chessPad, cpv &v, int8_t pid) {
         }
     }
     if (empty == 2) pad[7][7] = 1;
+    vprc vec;
+    ChessPiece p;
     for (int8_t x = 0; x < 15; x++)
-        for (int8_t y = 0; y < 15; y++)
-            if (pad[x][y]) v.push_back(ChessPiece(pid, x, y));
+        for (int8_t y = 0; y < 15; y++) {
+            p.set(pid, x, y);
+            if (pad[x][y]) vec.push_back({ -evaluate(chessPad, p), p });
+        }
+    sort(vec.begin(), vec.end());
+    int n = vec.size();// > 20 ? 20 : vec.size();
+    for (int i = 0; i < n; i++)
+        v.push_back(vec[i].second);
 }
 
 
@@ -70,7 +94,7 @@ int winwin;
 int AIPlayer::g(int8_t pid, const ChessPad& chessPad) {
     int typ1[11] = {}, typ2[11] = {};
     int a = f(pid, chessPad, typ1) - f(3 - pid, chessPad, typ2);
-    if (typ1[WIN5]) winwin = 1;
+    if (typ1[WIN5] || typ2[WIN5]) winwin = 1;
     else winwin = 0;
     int die4 = typ2[DIE4] + typ2[LOWDIE4];
     int alive3 = typ2[ALIVE3] + typ2[TIAO3];
@@ -105,11 +129,10 @@ int AIPlayer::g(int8_t pid, const ChessPad& chessPad) {
         a -= 60000;
     }
     else if (Alive3 >= 2 && !alive3 && !typ2[DIE3]) {
-        // 我们两个活3 对面没4也没3 也就是说这一步他们最多造个3出来（或者堵我们一个3）
+        // 我们两个活3 对面没4也没活3 也就是说这一步他们最多造个3出来（或者堵我们一个3）
         // 下一步我们就能活4 对面却不能活4
         a += 60000;
     }
-//    std::cerr << "AAA:" << alive3 << std::endl;
     return a;
 }
 
@@ -147,10 +170,11 @@ int AIPlayer::getExScore(int typenum[]) {
     return 0;
 }
 const int inf = 1e9 + 7;
+// 上一次是 turn 下的，现在为 pid 选择落点
 int AIPlayer::dfs(ChessPiece &maxp, int d, ChessPad &pad, int8_t pid, int alpha, int beta) {
-    int score = g(pid, pad);
+    int score = -g(3 - pid, pad);
     if (depth == d) return score;
-    if (winwin) return 1e7;
+    if (winwin) return score;
     cpv vec;
     generate(pad, vec, pid);
     if (vec.empty()) return score;

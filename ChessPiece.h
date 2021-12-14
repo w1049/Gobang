@@ -20,6 +20,7 @@ public:
     int8_t getPosX();
     int8_t getPosY();
     ChessPiece& set(int8_t, int8_t, int8_t);
+    bool operator<(const ChessPiece& p) const;
 };
 
 typedef std::vector<ChessPiece> cpv;

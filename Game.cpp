@@ -19,7 +19,7 @@ void Game::gameMain() {
             infoGameOver(i);
             break;
         }
-        i = (i == 1 ? 2 : 1);
+        i = 3 - i;
     }
 }
     
