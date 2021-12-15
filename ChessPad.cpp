@@ -16,17 +16,27 @@ int8_t ChessPad::place(ChessPiece p) {
 
 // 是否禁手
 int8_t ChessPad::isBanned(ChessPiece p) const {
+    bool ong = 0;
     if (p.getPid() == 2) return 0;
-    // 判断禁手并返回1
+    // 判断禁手并返回
+    int typ[11] = {};
+    for (int i = 0, t; i < 4; i++) {
+        t = getType(p, i, 1);
+        if (t == INF) ong = 1; // 长连
+        else ++typ[t];
+    }
+    if (ong && !typ[WIN5]) return 3;
+    if (typ[ALIVE3] + typ[TIAO3] >= 2) return 4; // 33
+    if (typ[DIE4] + typ[LOWDIE4] >= 2) return 5; // 44
     return 0;
 }
 
-// 判断是否可以放置棋子. 返回值为0代表可以放置，1代表该位置已有棋子，2代表可以放置, 但禁手（暂不区分禁手原因），3代表出界.
+// 判断是否可以放置棋子. 返回值为0代表可以放置，1代表该位置已有棋子，2代表出界，3 4 5代表可以放置，但禁手.
 int8_t ChessPad::check(ChessPiece p) const {
     int8_t x = p.getPosX(), y = p.getPosY();
-    if (x < 0 || x >= 15 || y < 0 || y >= 15) return 3;
+    if (x < 0 || x >= 15 || y < 0 || y >= 15) return 2;
     if (pad[x][y]) return 1;
-    if (isBanned(p)) return 2;
+    if (mode) return isBanned(p);
     return 0;
 }
 
@@ -51,7 +61,7 @@ void ChessPad::remove(int8_t pid) {
     pad[p.getPosX()][p.getPosY()] = 0;
 }
 
-ChessPad::ChessPad() {
+ChessPad::ChessPad(int mode): mode(mode) {
     memset(pad, 0, sizeof(pad));
     piece[0].clear();
     piece[1].clear();
@@ -61,14 +71,18 @@ ChessPad::ChessPad(const ChessPad& p) {
     piece[0] = p.piece[0];
     piece[1] = p.piece[1];
     memcpy(pad, p.pad, sizeof(pad));
+    mode = p.mode;
     // std::cerr << "COPY\n";
 }
-
-int ChessPad::getType(ChessPiece p, int8_t direc) const {
+int ChessPad::getMode() {
+    return mode;
+}
+int ChessPad::getType(ChessPiece p, int8_t direc, int8_t judgeLong) const {
     // if (rec[p.getPosX()][p.getPosY()][direc]) return rec[p.getPosX()][p.getPosY()][direc];
     int8_t line[9] = {};
     getLine(p, direc, line);
     int re = getType(line);
+    if (judgeLong && !line[4]) return INF;
 //    std::cerr << re << " ";
 //    for (int i = 0; i < 9; i++) std::cerr << (int)line[i] << ",";
 //    std::cerr << std::endl;
@@ -112,7 +126,11 @@ int ChessPad::getType(int8_t line[9]) const {
             r = 4 + i;  //保存断开位置
             break;
         }
-    if (cnt > 4) return WIN5;
+    if (cnt > 5) {
+        line[4] = 0; // 长连
+        return WIN5;
+    }
+    if (cnt == 5) return WIN5;
     int cl = line[l], cr = line[r];  // cl := (cl == hid)
     if (cnt == 4) {                       //中心线4连
         if (!cl && !cr)                   //两边断开位置均空

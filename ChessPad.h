@@ -11,10 +11,11 @@ private:
     cpv piece[2]; // 棋子; 下棋顺序
     int8_t isBanned(ChessPiece) const;
     const static int8_t dx[4], dy[4];
+    int8_t mode; // 禁手模式 0不禁
 public:
-    ChessPad();
+    ChessPad(int);
     ChessPad(const ChessPad&);
-    int getType(ChessPiece p, int8_t direc) const;
+    int getType(ChessPiece p, int8_t direc, int8_t = 0) const;
     void getLine(ChessPiece p, int8_t direc, int8_t[9]) const;
     int getType(int8_t[9]) const;
     int8_t place(ChessPiece);
@@ -26,6 +27,7 @@ public:
     int8_t p(int8_t, int8_t) const;
     const std::vector<ChessPiece>& getPiece(int) const;
     void remove(int8_t);
+    int getMode();
 };
 
 #endif

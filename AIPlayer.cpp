@@ -14,12 +14,11 @@ AIPlayer::AIPlayer(int8_t p = 0) {
     pid = p;
     type = 1;
     depth = 7;
+    r = 2;
     // TODO:
-    /* depth 应为奇数还是偶数
-     * 迭代加深
+    /* 
      * 禁手
     */
-    // is it necessary to set forced-scores in f&g?
 }
 
 typedef std::pair<int, ChessPiece> prc;
@@ -39,45 +38,56 @@ int AIPlayer::evaluate(ChessPad& pad, ChessPiece p) {
 // 上一次是 3 - pid 下的，现在为 pid 选择落点
 void AIPlayer::generate(ChessPad& chessPad, cpv &v, int8_t pid) {
     int8_t pad[15][15] = {}, empty = 0;
+    memset(pad, -1, sizeof(pad));
     v.clear();
     for (int k = 0; k <= 1; k++) {
         auto& plist = chessPad.getPiece(k);
         if (plist.empty()) ++empty;
         for (auto p : plist) {
-            for (int8_t i = -1; i <= 1; i++)
-                for (int8_t j = -1; j <= 1; j++) {
+            for (int8_t i = -r; i <= r; i++)
+                for (int8_t j = -r; j <= r; j++) {
                     int8_t x = p.getPosX() + i, y = p.getPosY() + j;
-                    if (!chessPad.check(ChessPiece(pid, x, y)) && !pad[x][y])
-                        pad[x][y] = 1;
+                    if (x >= 0 && x < 15 && y >= 0 && y < 15 && pad[x][y] == -1) {
+                        int ddd = chessPad.check(ChessPiece(1, x, y));
+                        pad[x][y] = ddd;
+                    }
+                        
                 }
         }
     }
-    if (empty == 2) pad[7][7] = 1;
+    if (empty == 2) pad[7][7] = 0;
     vprc vec;
     cpv win5, valive4, vdie4, vdouble3, valive3;
     cpv ualive4, udie4, udouble3, ualive3;
     ChessPiece p;
     for (int8_t x = 0; x < 15; x++)
         for (int8_t y = 0; y < 15; y++) {
-            if (!pad[x][y]) continue;
+            if (pad[x][y] == -1 || pad[x][y] == 1 || pad[x][y] == 2) continue;
 
             p.set(3 - pid, x, y);
-            int hiScore = evaluate(chessPad, p);
-            p.setPid(pid);
-            if (hiScore >= ss[WIN5]) win5.push_back(p);
-            else if (hiScore > ss[ALIVE4]) ualive4.push_back(p);
-            else if (hiScore > ss[DIE4]) udie4.push_back(p);
-            else if (hiScore > 2 * ss[ALIVE3]) udouble3.push_back(p);
-            else if (hiScore > ss[ALIVE3]) ualive3.push_back(p);
+            int hiScore;
+            if (!pad[x][y] || pid == 1 || !chessPad.getMode()) {
+                hiScore = evaluate(chessPad, p);
+                p.setPid(pid);
+                if (hiScore >= ss[WIN5]) win5.push_back(p);
+                else if (hiScore > ss[ALIVE4]) ualive4.push_back(p);
+                else if (hiScore > ss[DIE4]) udie4.push_back(p);
+                else if (hiScore > 2 * ss[ALIVE3]) udouble3.push_back(p);
+                else if (hiScore > ss[ALIVE3]) ualive3.push_back(p);
+            }
+            else hiScore = 0;
 
             p.set(pid, x, y);
-            int myScore = evaluate(chessPad, p);
-            if (myScore >= ss[WIN5]) win5.push_back(p);
-            else if (myScore > ss[ALIVE4]) valive4.push_back(p);
-            else if (myScore > ss[DIE4]) vdie4.push_back(p);
-            else if (myScore > 2 * ss[ALIVE3]) vdouble3.push_back(p);
-            else if (myScore > ss[ALIVE3]) valive3.push_back(p);
-            else vec.push_back({ hiScore - myScore, p });
+            int myScore;
+            if (!pad[x][y] || pid == 2 || !chessPad.getMode()) {
+                myScore = evaluate(chessPad, p);
+                if (myScore >= ss[WIN5]) win5.push_back(p);
+                else if (myScore > ss[ALIVE4]) valive4.push_back(p);
+                else if (myScore > ss[DIE4]) vdie4.push_back(p);
+                else if (myScore > 2 * ss[ALIVE3]) vdouble3.push_back(p);
+                else if (myScore > ss[ALIVE3]) valive3.push_back(p);
+                else vec.push_back({ hiScore - myScore, p });
+            }
         }
 
     if (!win5.empty()) v = win5;
@@ -213,7 +223,7 @@ int AIPlayer::getExScore(int typenum[]) {
     //if (typenum[DIE3] && typenum[ALIVE3]) return 2000;//死3高级活3
     return 0;
 }
-const int inf = 1e9 + 7;
+
 // 上一次是 turn 下的，现在为 pid 选择落点
 int AIPlayer::dfs(ChessPiece &maxp, int d, ChessPad &pad, int8_t pid, int alpha, int beta) {
     int score = -g(3 - pid, pad);
@@ -223,7 +233,7 @@ int AIPlayer::dfs(ChessPiece &maxp, int d, ChessPad &pad, int8_t pid, int alpha,
     generate(pad, vec, pid);
     if (vec.empty()) return score;
     // std::cerr << "VECSIZZE:" << vec.size() << std::endl;
-    int best = -inf;
+    int best = -INF;
     for (auto p : vec) {
         // std::cerr << (int)p.getPosX() << "place" << (int)p.getPosY() << std::endl;
         pad.place(p);

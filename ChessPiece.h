@@ -8,6 +8,8 @@ typedef signed char int8_t;
 typedef unsigned short uint16_t;
 typedef unsigned int uint32_t;
 
+const int INF = 1e9 + 7;
+
 class ChessPiece {
 private:
     int8_t pid;

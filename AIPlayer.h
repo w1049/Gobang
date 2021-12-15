@@ -9,14 +9,15 @@ public:
     AIPlayer(int8_t);
     ChessPiece getNextPos(const ChessPad&);
 private:
+    int8_t r;
     int evaluate(ChessPad& pad, ChessPiece p);
     void generate(ChessPad& chessPad, cpv& v, int8_t);
     int f(int8_t, const ChessPad&, int[11]);
     int g(int8_t, const ChessPad&);
     int getExScore(int[]);
-    int dfs(ChessPiece&, int d, ChessPad& pad, int8_t, int = -1e9-7, int = 1e9 + 7);
+    int dfs(ChessPiece&, int d, ChessPad& pad, int8_t, int = -INF, int = INF);
     int depth;
-    int a, b;
+    
 };
 
 #endif

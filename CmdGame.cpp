@@ -10,7 +10,8 @@ using std::cout;
 using std::endl;
 
 void CmdGame::gameInit() {
-    chessPad = new ChessPad;
+    mode = 1;
+    chessPad = new ChessPad(mode);
     cout << "1：人机\n2：机人\n其他：人人" << endl;
     char x = cin.get();
     if (x == '1') {
@@ -23,7 +24,6 @@ void CmdGame::gameInit() {
         p[0] = new CmdPlayer(1);
         p[1] = new CmdPlayer(2);
     }
-    mode = 0;
 }
 
 void CmdGame::infoGameOver(int8_t pid) {
