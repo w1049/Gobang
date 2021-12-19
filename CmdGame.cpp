@@ -9,24 +9,42 @@ using std::cin;
 using std::cout;
 using std::endl;
 
-void CmdGame::gameInit() {
-    mode = 1;
-    chessPad = new ChessPad(mode);
-    cout << "1：人机\n2：机人\n其他：人人" << endl;
-    char x = cin.get();
-    if (x == '1') {
+CmdGame::CmdGame(int type, int mode) {
+    switch (type) {
+    case 1:
         p[0] = new CmdPlayer(1);
         p[1] = new AIPlayer(2);
-    } else if (x == '2') {
+        break;
+    case 2:
         p[0] = new AIPlayer(1);
         p[1] = new CmdPlayer(2);
-    } else {
+        break;
+    default:
         p[0] = new CmdPlayer(1);
         p[1] = new CmdPlayer(2);
+        break;
+    }
+    chessPad = new ChessPad(mode);
+}
+
+void CmdGame::start() {
+    displayPad();
+    char c;
+    while (1) {
+        cin >> c;
+        if (c == 'u') { // 没做检测（不能一直悔棋！）
+            chessPad->remove(3 - turn);
+            displayPad();
+            turn = 3 - turn;
+        }
+        else {
+            int code = step();
+            if (code) break;
+        }
     }
 }
 
-void CmdGame::infoGameOver(int8_t pid) {
+void CmdGame::infoGameOver(int pid) {
     cout << (pid == 1 ? "●" : "○");
     if (p[pid - 1]->getType() == 0) {
         cout << "玩家" << (int)pid << "赢了! " << endl;
@@ -52,13 +70,13 @@ void CmdGame::displayPad() {
         cout << endl;
     }
 }
-void CmdGame::refreshPad(ChessPiece p) {
+void CmdGame::refreshPad(const ChessPiece &p) {
     system("cls");
     cout << "   A  B  C  D  E  F  G  H  I  J  K  L  M  N  O" << endl;
     for (int8_t i = 0; i < 15; i++) {
         cout << std::setw(2) << (int)(i + 1) << " ";
         for (int8_t j = 0; j < 15; j++) {
-            if (i == p.getPosX() && j == p.getPosY())
+            if (i == p.getX() && j == p.getY())
                 cout << "\b(" << toS(chessPad->p(i, j)) << "\b)";
             else cout << toS(chessPad->p(i, j));
         }
@@ -67,7 +85,7 @@ void CmdGame::refreshPad(ChessPiece p) {
 }
 
 CmdGame::~CmdGame() {
-    delete chessPad;
     delete p[0];
     delete p[1];
+    delete chessPad;
 }

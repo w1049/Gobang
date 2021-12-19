@@ -7,26 +7,26 @@
 
 class ChessPad {
 private:
-    int8_t pad[15][15]; // æ£‹ç›˜
-    cpv piece[2]; // æ£‹å­; ä¸‹æ£‹é¡ºåº
-    int8_t isBanned(ChessPiece) const;
+    int8_t pad[15][15]; // ÆåÅÌ
+    cpv piece[2]; // Æå×Ó; ÏÂÆåË³Ğò
+    int8_t isBanned(const ChessPiece&) const;
     const static int8_t dx[4], dy[4];
-    int8_t mode; // ç¦æ‰‹æ¨¡å¼ 0ä¸ç¦
+    int8_t mode; // ½ûÊÖÄ£Ê½ 0²»½û
 public:
     ChessPad(int);
     ChessPad(const ChessPad&);
-    int getType(ChessPiece p, int8_t direc, int8_t = 0) const;
-    void getLine(ChessPiece p, int8_t direc, int8_t[9]) const;
+    int getType(const ChessPiece&, int direc, int = 0) const;
+    void getLine(const ChessPiece&, int direc, int8_t[9]) const;
     int getType(int8_t[9]) const;
-    int8_t place(ChessPiece);
-    // ä¸‹æ£‹å­. ä¸å†åˆ¤æ–­æ˜¯å¦åˆæ³•. è°ƒç”¨å‰è¯·å…ˆè°ƒç”¨check. ç¦æ‰‹ä¹Ÿå¯å¼ºè¡Œæ”¾ç½®.(ç”±Gameç±»å†³å®šæ˜¯å¦æ”¾ç½®ï¼Œè¿™é‡Œåªéœ€å®ç°æ”¾ç½®).
-    int8_t check(ChessPiece) const;
-    // åˆ¤æ–­æ˜¯å¦å¯ä»¥æ”¾ç½®æ£‹å­. è¿”å›å€¼ä¸º0ä»£è¡¨å¯ä»¥æ”¾ç½®ï¼Œ1ä»£è¡¨è¯¥ä½ç½®å·²æœ‰æ£‹å­ï¼Œ2ä»£è¡¨å¯ä»¥æ”¾ç½®, ä½†ç¦æ‰‹ï¼ˆæš‚ä¸åŒºåˆ†ç¦æ‰‹åŸå› ï¼‰.
-    int8_t judge(ChessPiece) const;
-    // åˆ¤æ–­ä¸‹å®Œè¯¥æ£‹å­åæ˜¯å¦èƒœåˆ©. è¿”å›å€¼ä¸º0è¡¨ç¤ºä¸èƒœåˆ©ï¼Œ1è¡¨ç¤ºèƒœåˆ©ï¼Œ2è¡¨ç¤ºå¹³å±€.
+    int8_t place(const ChessPiece&);
+    // ÏÂÆå×Ó. ²»ÔÙÅĞ¶ÏÊÇ·ñºÏ·¨. µ÷ÓÃÇ°ÇëÏÈµ÷ÓÃcheck. ½ûÊÖÒ²¿ÉÇ¿ĞĞ·ÅÖÃ.(ÓÉGameÀà¾ö¶¨ÊÇ·ñ·ÅÖÃ£¬ÕâÀïÖ»ĞèÊµÏÖ·ÅÖÃ).
+    int8_t check(const ChessPiece&) const;
+    // ÅĞ¶ÏÊÇ·ñ¿ÉÒÔ·ÅÖÃÆå×Ó. ·µ»ØÖµÎª0´ú±í¿ÉÒÔ·ÅÖÃ£¬1´ú±í¸ÃÎ»ÖÃÒÑÓĞÆå×Ó£¬2´ú±í¿ÉÒÔ·ÅÖÃ, µ«½ûÊÖ£¨Ôİ²»Çø·Ö½ûÊÖÔ­Òò£©.
+    int8_t judge(const ChessPiece&) const;
+    // ÅĞ¶ÏÏÂÍê¸ÃÆå×ÓºóÊÇ·ñÊ¤Àû. ·µ»ØÖµÎª0±íÊ¾²»Ê¤Àû£¬1±íÊ¾Ê¤Àû£¬2±íÊ¾Æ½¾Ö.
     int8_t p(int8_t, int8_t) const;
     const std::vector<ChessPiece>& getPiece(int) const;
-    void remove(int8_t);
+    void remove(int);
     int getMode();
 };
 

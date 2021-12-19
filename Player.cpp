@@ -1,9 +1,11 @@
 #include "Player.h"
 
-int8_t Player::getType() {
+int Player::getType() {
 	return type;
 }
 
-int8_t Player::getPid() {
+Player::Player(int pid, int type): pid(pid), type(type) {}
+
+int Player::getPid() {
 	return pid;
 }

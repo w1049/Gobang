@@ -7,10 +7,7 @@ using std::cin;
 using std::cout;
 using std::endl;
 
-CmdPlayer::CmdPlayer(int8_t p = 0) {
-    pid = p;
-    type = 0;
-}
+CmdPlayer::CmdPlayer(int p): Player(p, 0) {}
 
 ChessPiece CmdPlayer::getNextPos(const ChessPad& pad) {
     ChessPiece p;
@@ -26,13 +23,13 @@ ChessPiece CmdPlayer::getNextPos(const ChessPad& pad) {
         else continue;
         cin >> x;
         if (cin.fail() || x < 1 || x > 15 || cy < 0 || cy >= 15) continue;
-        if (reason = pad.check(p.set(pid, x-1, cy))) {
+        if (reason = pad.check(p.set(pid, x - 1, cy))) {
             infoFailed(p, reason);
         }
         else return p;
     }
 }
 
-void CmdPlayer::infoFailed(ChessPiece p, int8_t reason) {
-    cout << "由于原因" << (int)reason << ", 你不能在" << char(p.getPosY() + 'A') << (int)p.getPosX() + 1 << "下棋." << endl;
+void CmdPlayer::infoFailed(const ChessPiece &p, int8_t reason) {
+    cout << "由于原因" << (int)reason << ", 你不能在" << char(p.getY() + 'A') << (int)p.getX() + 1 << "下棋." << endl;
 }

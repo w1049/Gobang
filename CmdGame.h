@@ -5,10 +5,11 @@
 
 class CmdGame : public Game {
 public:
-    void gameInit();
-    void infoGameOver(int8_t pid); // æç¤ºæ¸¸æˆç»“æŸï¼Œå±•ç¤ºèƒœè€…æˆ–å¹³å±€
-    void displayPad(); // æ˜¾ç¤ºæ£‹ç›˜. ç¬¬ä¸€æ¬¡æ˜¾ç¤ºæ£‹ç›˜æ—¶ä½¿ç”¨.
-    void refreshPad(ChessPiece); // åˆ·æ–°æ£‹ç›˜. ä»…æ”¹å˜ä¸ªåˆ«æ£‹å­.
+    CmdGame(int, int);
+    void start();
+    void infoGameOver(int pid); // ÌáÊ¾ÓÎÏ·½áÊø£¬Õ¹Ê¾Ê¤Õß»òÆ½¾Ö
+    void displayPad(); // ÏÔÊ¾ÆåÅÌ. µÚÒ»´ÎÏÔÊ¾ÆåÅÌÊ±Ê¹ÓÃ.
+    void refreshPad(const ChessPiece&); // Ë¢ĞÂÆåÅÌ. ½ö¸Ä±ä¸ö±ğÆå×Ó.
     ~CmdGame();
 };
 

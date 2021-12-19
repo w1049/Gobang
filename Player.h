@@ -5,12 +5,13 @@
 
 class Player {
 protected:
-    int8_t pid;
-    int8_t type;
+    int pid;
+    int type;
 public:
-    int8_t getPid();
-    int8_t getType();
-    // ä¼ å…¥å½“å‰æƒ…å†µ, è·å–ä¸‹ä¸€æ­¥çš„ä½ç½®. å¯¹äºç©å®¶æ˜¯ç­‰å¾…ä¸€ä¸ªè¾“å…¥, å¯¹äºAIæ˜¯è®¡ç®—
+    Player(int, int);
+    int getPid();
+    int getType();
+    // ´«Èëµ±Ç°Çé¿ö, »ñÈ¡ÏÂÒ»²½µÄÎ»ÖÃ. ¶ÔÓÚÍæ¼ÒÊÇµÈ´ıÒ»¸öÊäÈë, ¶ÔÓÚAIÊÇ¼ÆËã
     virtual ChessPiece getNextPos(const ChessPad&) = 0;
 };
 

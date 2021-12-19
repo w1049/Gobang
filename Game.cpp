@@ -1,35 +1,26 @@
 #include "Game.h"
 #include "Player.h"
 
-
-    // ChessPad *chessPad;
-    // Player *p[2];
-    // int8_t mode; // ç¦æ‰‹è§„åˆ™. 0:æ— ç¦æ‰‹; 1:æœ‰æç¤º,ç¦æ­¢æ”¾ç½®; 2:æ— æç¤º,ç›´æ¥åˆ¤è´Ÿ.
-
-void Game::gameMain() {
-    displayPad();
-    ChessPiece tmp(0,0,0);
-    int8_t code, i = 1;
-    while (1) {
-        tmp = p[i-1]->getNextPos(*chessPad);
-        chessPad->place(tmp);
-        refreshPad(tmp);
-        code = chessPad->judge(tmp);
-        if (code) {
-            infoGameOver(i);
-            break;
-        }
-        i = 3 - i;
+int Game::step() {
+    ChessPiece tmp = p[turn - 1]->getNextPos(*chessPad);
+    chessPad->place(tmp);
+    refreshPad(tmp);
+    int code = chessPad->judge(tmp);
+    if (code) {
+        infoGameOver(turn);
+        return 1;
     }
+    turn = 3 - turn;
+    return 0;
 }
     
-    // virtual infoGameOver(int8_t pid) = 0; // æç¤ºæ¸¸æˆç»“æŸï¼Œå±•ç¤ºèƒœè€…æˆ–å¹³å±€
-    // virtual infoPlaceFailed(ChessPiece, int8_t reason) = 0; // æç¤ºæ— æ³•æ”¾ç½®æ£‹å­
-    // virtual displayPad() = 0; // æ˜¾ç¤ºæ£‹ç›˜. ç¬¬ä¸€æ¬¡æ˜¾ç¤ºæ£‹ç›˜æ—¶ä½¿ç”¨.
-    // virtual refreshPad() = 0; // åˆ·æ–°æ£‹ç›˜. ä»…æ”¹å˜ä¸ªåˆ«æ£‹å­.
+    // virtual infoGameOver(int8_t pid) = 0; // ÌáÊ¾ÓÎÏ·½áÊø£¬Õ¹Ê¾Ê¤Õß»òÆ½¾Ö
+    // virtual infoPlaceFailed(ChessPiece, int8_t reason) = 0; // ÌáÊ¾ÎŞ·¨·ÅÖÃÆå×Ó
+    // virtual displayPad() = 0; // ÏÔÊ¾ÆåÅÌ. µÚÒ»´ÎÏÔÊ¾ÆåÅÌÊ±Ê¹ÓÃ.
+    // virtual refreshPad() = 0; // Ë¢ĞÂÆåÅÌ. ½ö¸Ä±ä¸ö±ğÆå×Ó.
 
 
-// æ¸¸æˆä¸»å‡½æ•°ï¼Œæ§åˆ¶æ¸¸æˆæµç¨‹ä¸å¤§éƒ¨åˆ†è¾“å…¥è¾“å‡º. å…·ä½“å‚è§æ¸¸æˆæµç¨‹.
-// å¯è°ƒç”¨ä¸¤ä¸ªPlayerä¸ä¸€ä¸ªClassPadä¸­çš„å‡½æ•°.
-// å¯è°ƒç”¨ä¸‹é¢çš„è™šå‡½æ•°æ¥è¿›è¡Œè¾“å…¥è¾“å‡º.
-// æ¸¸æˆç»“æŸåç›´æ¥ return. ï¼ˆä»¥åå†åŠ æ‚”æ£‹ï¼‰
+// ÓÎÏ·Ö÷º¯Êı£¬¿ØÖÆÓÎÏ·Á÷³ÌÓë´ó²¿·ÖÊäÈëÊä³ö. ¾ßÌå²Î¼ûÓÎÏ·Á÷³Ì.
+// ¿Éµ÷ÓÃÁ½¸öPlayerÓëÒ»¸öClassPadÖĞµÄº¯Êı.
+// ¿Éµ÷ÓÃÏÂÃæµÄĞéº¯ÊıÀ´½øĞĞÊäÈëÊä³ö.
+// ÓÎÏ·½áÊøºóÖ±½Ó return. £¨ÒÔºóÔÙ¼Ó»ÚÆå£©

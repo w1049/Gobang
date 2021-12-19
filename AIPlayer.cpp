@@ -10,21 +10,12 @@ const int sc[11] = { 100, 60, 60, 50, 60, 16, 12, 13, 5, 3, 0 };
 const int ss[11] = { 100000, 10000, 1000, 1000, 100, 100, 10, 10, 1, 0 };
 const int kk[10] = { 5, 4, 4, 4, 3, 3, 3, 2, 2, 2 };
 
-AIPlayer::AIPlayer(int8_t p = 0) {
-    pid = p;
-    type = 1;
-    depth = 7;
-    r = 2;
-    // TODO:
-    /* 
-     * ½ûÊÖ
-    */
-}
+AIPlayer::AIPlayer(int p) : Player(p, 1), depth(7), r(2) {}
 
 typedef std::pair<int, ChessPiece> prc;
 typedef std::vector<prc> vprc;
 
-int AIPlayer::evaluate(ChessPad& pad, ChessPiece p) {
+int AIPlayer::evaluate(ChessPad& pad, const ChessPiece &p) {
     int typ[11] = {}, ret = 0;
     pad.place(p);
     for (int i = 0; i < 4; i++)
@@ -46,7 +37,7 @@ void AIPlayer::generate(ChessPad& chessPad, cpv &v, int8_t pid) {
         for (auto p : plist) {
             for (int8_t i = -r; i <= r; i++)
                 for (int8_t j = -r; j <= r; j++) {
-                    int8_t x = p.getPosX() + i, y = p.getPosY() + j;
+                    int8_t x = p.getX() + i, y = p.getY() + j;
                     if (x >= 0 && x < 15 && y >= 0 && y < 15 && pad[x][y] == -1) {
                         int ddd = chessPad.check(ChessPiece(1, x, y));
                         pad[x][y] = ddd;
@@ -117,7 +108,7 @@ void AIPlayer::generate(ChessPad& chessPad, cpv &v, int8_t pid) {
 
 int types[11];
 ostream& operator<<(ostream& o, ChessPiece& p) {
-    o << (int)p.getPid() << "-" << char(p.getPosY() + 'A') << (int)(p.getPosX() + 1);
+    o << (int)p.getPid() << "-" << char(p.getY() + 'A') << (int)(p.getX() + 1);
     return o;
 }
 ChessPiece AIPlayer::getNextPos(const ChessPad& oriChessPad) {
