@@ -7,15 +7,16 @@ enum ChessType { WIN5, ALIVE4, DIE4, LOWDIE4, ALIVE3, TIAO3, DIE3, ALIVE2, LOWAL
 const int8_t ChessPad::dx[4] = { 0, 1, 1, 1 }, ChessPad::dy[4] = { 1, 0, 1, -1 };
 
 // 下棋子. 不再判断是否合法. 调用前请先调用check. 禁手也可强行放置.(由Game类决定是否放置，这里只需实现放置).
-int8_t ChessPad::place(const ChessPiece &p) {
+int ChessPad::place(const ChessPiece &p) {
     pad[p.getX()][p.getY()] = p.getPid();
     //pid=1先手,pid=2后手.
     piece[p.getPid()-1].push_back(p);
+    list.push_back(p);
     return 0;
 }
 
 // 是否禁手
-int8_t ChessPad::isBanned(const ChessPiece &p) const {
+int ChessPad::isBanned(const ChessPiece &p) const {
     bool ong = 0;
     if (p.getPid() == 2) return 0;
     // 判断禁手并返回
@@ -32,7 +33,7 @@ int8_t ChessPad::isBanned(const ChessPiece &p) const {
 }
 
 // 判断是否可以放置棋子. 返回值为0代表可以放置，1代表该位置已有棋子，2代表出界，3 4 5代表可以放置，但禁手.
-int8_t ChessPad::check(const ChessPiece &p) const {
+int ChessPad::check(const ChessPiece &p) const {
     int8_t x = p.getX(), y = p.getY();
     if (x < 0 || x >= 15 || y < 0 || y >= 15) return 2;
     if (pad[x][y]) return 1;
@@ -41,23 +42,25 @@ int8_t ChessPad::check(const ChessPiece &p) const {
 }
 
 // 判断下完该棋子后是否胜利.（该棋子已下）返回值为0表示不胜利，1表示胜利，2表示平局.
-int8_t ChessPad::judge(const ChessPiece &p) const {
+int ChessPad::judge(const ChessPiece &p) const {
     for (int i = 0; i < 4; i++)
         if (getType(p, i) == WIN5) return 1;
     return 0;
 }
 
-int8_t ChessPad::p(int8_t i, int8_t j) const {
+int ChessPad::p(int8_t i, int8_t j) const {
     return pad[i][j];
 }
 
-const std::vector<ChessPiece>& ChessPad::getPiece(int i) const {
-    return piece[i];
+const cpv& ChessPad::getPiece(int i) const {
+    if (i >= 0 && i < 2) return piece[i];
+    return list;
 }
 
 void ChessPad::remove(int pid) {
     ChessPiece p = piece[pid - 1].back();
     piece[pid - 1].pop_back();
+    list.pop_back();
     pad[p.getX()][p.getY()] = 0;
 }
 
@@ -65,11 +68,13 @@ ChessPad::ChessPad(int mode): mode(mode) {
     memset(pad, 0, sizeof(pad));
     piece[0].clear();
     piece[1].clear();
+    list.clear();
 }
 
 ChessPad::ChessPad(const ChessPad& p) {
     piece[0] = p.piece[0];
     piece[1] = p.piece[1];
+    list = p.list;
     memcpy(pad, p.pad, sizeof(pad));
     mode = p.mode;
     // std::cerr << "COPY\n";

@@ -9,6 +9,9 @@ public:
     CmdPlayer(int);
     ChessPiece getNextPos(const ChessPad&);
     void infoFailed(const ChessPiece&, int8_t);
+    int command(const ChessPad&);
+private:
+    int8_t Tx, Ty;
 };
 
 #endif

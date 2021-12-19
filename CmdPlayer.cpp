@@ -1,4 +1,6 @@
 #include <iostream>
+#include <string>
+#include <sstream>
 
 #include "CmdPlayer.h"
 #include "ChessPiece.h"
@@ -10,26 +12,41 @@ using std::endl;
 CmdPlayer::CmdPlayer(int p): Player(p, 0) {}
 
 ChessPiece CmdPlayer::getNextPos(const ChessPad& pad) {
-    ChessPiece p;
-    int8_t reason;
-    while (1) {
-        cout << "轮到" << (pid == 1 ? "●" : "○") << "方下棋。请输入坐标，形式为“A8”\n（不含引号，若格式不对我也不知道会发生什么）: " << endl;
-        char cy;
-        int x;
-        cin.clear(); cin.sync();
-        cin >> cy;
-        if ('a' <= cy && cy <= 'z') cy -= 'a';
-        else if ('A' <= cy && cy <= 'Z') cy -= 'A';
-        else continue;
-        cin >> x;
-        if (cin.fail() || x < 1 || x > 15 || cy < 0 || cy >= 15) continue;
-        if (reason = pad.check(p.set(pid, x - 1, cy))) {
-            infoFailed(p, reason);
-        }
-        else return p;
-    }
+    return ChessPiece(pid, Tx, Ty);
 }
 
 void CmdPlayer::infoFailed(const ChessPiece &p, int8_t reason) {
     cout << "由于原因" << (int)reason << ", 你不能在" << char(p.getY() + 'A') << (int)p.getX() + 1 << "下棋." << endl;
+}
+// ask
+// undo
+// H8
+int CmdPlayer::command(const ChessPad& pad) {
+    ChessPiece p;
+    int8_t reason;
+    while (1) {
+        cout << "轮到" << (pid == 1 ? "●" : "○") << "方下棋。请输入坐标，形式为“A8”\n（不含引号，若格式不对我也不知道会发生什么）: " << endl;
+        char cy;  int x;
+        std::string str;
+        cin.clear(); cin.sync();
+        std::getline(cin, str);
+        if (str == "undo") return 1;
+        else if (str == "ask") return 2;
+        std::stringstream ss(str);
+        ss >> cy;
+        if ('a' <= cy && cy <= 'z') cy -= 'a';
+        else if ('A' <= cy && cy <= 'Z') cy -= 'A';
+        else continue;
+        if (!isdigit(str[1])) continue;
+        ss >> x;
+        if (ss.fail() || x < 1 || x > 15 || cy < 0 || cy >= 15) continue;
+        if (reason = pad.check(p.set(pid, x - 1, cy))) {
+            infoFailed(p, reason);
+        }
+        else {
+            Tx = p.getX(), Ty = p.getY();
+            break;
+        }
+    }
+    return 0;
 }

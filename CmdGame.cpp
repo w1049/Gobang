@@ -29,18 +29,30 @@ CmdGame::CmdGame(int type, int mode) {
 
 void CmdGame::start() {
     displayPad();
-    char c;
+//    char c;
     while (1) {
-        cin >> c;
-        if (c == 'u') { // 没做检测（不能一直悔棋！）
-            chessPad->remove(3 - turn);
-            displayPad();
-            turn = 3 - turn;
+//        cin >> c;
+//        if (c == 'u') { // 没做检测（不能一直悔棋！）
+//            chessPad->remove(3 - turn);
+//            displayPad();
+//            turn = 3 - turn;
+//        }
+//        else {
+        int code = 0;
+        if (!p[turn - 1]->getType()) {
+            code = ((CmdPlayer*)p[turn - 1])->command(*chessPad);
+            cout << "code=" << code << endl;
+            if (code == 1) { // undo
+                turn = chessPad->getPiece(3).back().getPid();
+                chessPad->remove(turn);
+                displayPad();
+            } else if (code == 2) { // ask
+            }
         }
-        else {
-            int code = step();
-            if (code) break;
-        }
+        if (code) continue; // if code is not 0, means runs undo. let next player do.
+        code = step();
+        if (code) break;
+//       }
     }
 }
 

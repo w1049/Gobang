@@ -30,6 +30,7 @@ int main() {
         cin.get();
         cout << "0：无禁手\n1：禁手" << endl;
         char y = cin.get();
+        cin.get();
         CmdGame g(x - '0', y - '0');
         g.start();
         cout << "按回车键退出游戏，或输入1再来一局" << endl;
