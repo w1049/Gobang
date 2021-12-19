@@ -10,7 +10,7 @@ const int sc[11] = { 100, 60, 60, 50, 60, 16, 12, 13, 5, 3, 0 };
 const int ss[11] = { 100000, 10000, 1000, 1000, 100, 100, 10, 10, 1, 0 };
 const int kk[10] = { 5, 4, 4, 4, 3, 3, 3, 2, 2, 2 };
 
-AIPlayer::AIPlayer(int p) : Player(p, 1), depth(7), r(2) {}
+AIPlayer::AIPlayer(int p) : Player(p, 1), depth(7), r(1) {}
 
 typedef std::pair<int, ChessPiece> prc;
 typedef std::vector<prc> vprc;

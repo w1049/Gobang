@@ -9,7 +9,7 @@ using std::cin;
 using std::cout;
 using std::endl;
 
-CmdPlayer::CmdPlayer(int p): Player(p, 0) {}
+CmdPlayer::CmdPlayer(int p): Player(p, 0), Tx(0), Ty(0) {}
 
 ChessPiece CmdPlayer::getNextPos(const ChessPad& pad) {
     return ChessPiece(pid, Tx, Ty);
