@@ -27,30 +27,12 @@ CmdGame::CmdGame(int type, int mode) {
     chessPad = new ChessPad(mode);
 }
 
-void CmdGame::start() {
-    displayPad();
-    while (1) {
-        int code = 0;
-        if (!p[turn - 1]->getType()) {
-            cout << "当前局势：" << -AI::g(3 - turn, *chessPad) << endl;
-            info(turn);
-            code = dynamic_cast<CmdPlayer*>(p[turn - 1])->command(*chessPad);
-            if (code == 1) { // undo
-                if (!undo()) continue;
-                if (p[turn - 1]->getType()) if (!undo()) continue;
-            } else if (code == 2) { // ask
-                AIPlayer ai = AIPlayer(turn);
-                ChessPiece p = ai.getNextPos(*chessPad);
-                cout << "Recommand: " << char(p.getY() + 'A') << (int)p.getX() + 1 << endl;
-            }
-        }
-        if (code) continue;
-        code = step();
-        if (code) break;
-    }
+void CmdGame::reco(const ChessPiece& p) {
+    cout << "Recommand: " << char(p.getY() + 'A') << (int)p.getX() + 1 << endl;
 }
 
 void CmdGame::info(int pid) {
+    cout << "当前局势：" << -AI::g(3 - turn, *chessPad) << endl;
     ChessPiece p;
     cpv banned, win5;
     for (int8_t x = 0; x < 15; x++)
