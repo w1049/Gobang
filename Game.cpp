@@ -13,6 +13,17 @@ int Game::step() {
     turn = 3 - turn;
     return 0;
 }
+
+bool Game::undo() {
+    if (chessPad->getPiece().empty()) {
+        return 0;
+    }
+    ChessPiece p = chessPad->getPiece().back();
+    turn = p.getPid();
+    chessPad->remove();
+    displayPad();
+    return 1;
+}
     
     // virtual infoGameOver(int8_t pid) = 0; // 提示游戏结束，展示胜者或平局
     // virtual infoPlaceFailed(ChessPiece, int8_t reason) = 0; // 提示无法放置棋子

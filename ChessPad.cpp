@@ -10,7 +10,7 @@ const int8_t ChessPad::dx[4] = { 0, 1, 1, 1 }, ChessPad::dy[4] = { 1, 0, 1, -1 }
 int ChessPad::place(const ChessPiece &p) {
     pad[p.getX()][p.getY()] = p.getPid();
     //pid=1先手,pid=2后手.
-    piece[p.getPid()-1].push_back(p);
+    // piece[p.getPid()-1].push_back(p);
     list.push_back(p);
     return 0;
 }
@@ -52,28 +52,29 @@ int ChessPad::p(int8_t i, int8_t j) const {
     return pad[i][j];
 }
 
-const cpv& ChessPad::getPiece(int i) const {
-    if (i >= 0 && i < 2) return piece[i];
+const cpv& ChessPad::getPiece() const {
+    // if (i >= 0 && i < 2) return piece[i];
     return list;
 }
 
-void ChessPad::remove(int pid) {
-    ChessPiece p = piece[pid - 1].back();
-    piece[pid - 1].pop_back();
+void ChessPad::remove() {
+    // ChessPiece p = piece[pid - 1].back();
+    ChessPiece p = list.back();
+    // piece[pid - 1].pop_back();
     list.pop_back();
     pad[p.getX()][p.getY()] = 0;
 }
 
 ChessPad::ChessPad(int mode): mode(mode) {
     memset(pad, 0, sizeof(pad));
-    piece[0].clear();
-    piece[1].clear();
+    // piece[0].clear();
+    // piece[1].clear();
     list.clear();
 }
 
 ChessPad::ChessPad(const ChessPad& p) {
-    piece[0] = p.piece[0];
-    piece[1] = p.piece[1];
+    // piece[0] = p.piece[0];
+    // piece[1] = p.piece[1];
     list = p.list;
     memcpy(pad, p.pad, sizeof(pad));
     mode = p.mode;

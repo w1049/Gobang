@@ -11,6 +11,7 @@ protected:
     int turn = 1;
 public:
     int step();
+    bool undo();
     virtual void infoGameOver(int pid) = 0; // 提示游戏结束，展示胜者或平局
     virtual void displayPad() = 0; // 显示棋盘. 第一次显示棋盘时使用.
     virtual void refreshPad(const ChessPiece&) = 0; // 刷新棋盘. 仅改变个别棋子.

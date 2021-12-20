@@ -25,7 +25,7 @@ int CmdPlayer::command(const ChessPad& pad) {
     ChessPiece p;
     int8_t reason;
     while (1) {
-        cout << "轮到" << (pid == 1 ? "●" : "○") << "方下棋。请输入坐标，形式为“A8”\n（不含引号，若格式不对我也不知道会发生什么）: " << endl;
+        cout << "轮到" << (pid == 1 ? "●" : "○") << "方下棋。请输入坐标，形式为“A8”（不含引号）: " << endl;
         char cy;  int x;
         std::string str;
         cin.clear(); cin.sync();

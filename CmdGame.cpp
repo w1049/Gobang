@@ -29,30 +29,51 @@ CmdGame::CmdGame(int type, int mode) {
 
 void CmdGame::start() {
     displayPad();
-//    char c;
     while (1) {
-//        cin >> c;
-//        if (c == 'u') { // 没做检测（不能一直悔棋！）
-//            chessPad->remove(3 - turn);
-//            displayPad();
-//            turn = 3 - turn;
-//        }
-//        else {
         int code = 0;
         if (!p[turn - 1]->getType()) {
-            code = ((CmdPlayer*)p[turn - 1])->command(*chessPad);
-            cout << "code=" << code << endl;
+            cout << "当前局势：" << -AI::g(3 - turn, *chessPad) << endl;
+            info(turn);
+            code = dynamic_cast<CmdPlayer*>(p[turn - 1])->command(*chessPad);
             if (code == 1) { // undo
-                turn = chessPad->getPiece(3).back().getPid();
-                chessPad->remove(turn);
-                displayPad();
+                if (!undo()) continue;
+                if (p[turn - 1]->getType()) if (!undo()) continue;
             } else if (code == 2) { // ask
+                AIPlayer ai = AIPlayer(turn);
+                ChessPiece p = ai.getNextPos(*chessPad);
+                cout << "Recommand: " << char(p.getY() + 'A') << (int)p.getX() + 1 << endl;
             }
         }
-        if (code) continue; // if code is not 0, means runs undo. let next player do.
+        if (code) continue;
         code = step();
         if (code) break;
-//       }
+    }
+}
+
+void CmdGame::info(int pid) {
+    ChessPiece p;
+    cpv banned, win5;
+    for (int8_t x = 0; x < 15; x++)
+        for (int8_t y = 0; y < 15; y++) {
+            int code = chessPad->check(p.set(pid, x, y));
+            if (code == 3 || code == 4 || code == 5) banned.push_back(p);
+        }
+    for (int8_t x = 0; x < 15; x++)
+        for (int8_t y = 0; y < 15; y++) {
+            if(!chessPad->check(p.set(3 - pid, x, y)) &&
+                chessPad->judge(p)) win5.push_back(p);
+        }
+    if (!banned.empty()) {
+        cout << "警告：禁手点 ";
+        for (auto p : banned)
+            cout << char(p.getY() + 'A') << (int)p.getX() + 1 << " ";
+        cout << endl;
+    }
+    if (!win5.empty()) {
+        cout << "警告：成五点 ";
+        for (auto p : win5)
+            cout << char(p.getY() + 'A') << (int)p.getX() + 1 << " ";
+        cout << endl;
     }
 }
 
