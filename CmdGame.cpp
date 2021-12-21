@@ -62,9 +62,9 @@ void CmdGame::info(int pid) {
 void CmdGame::infoGameOver(int pid) {
     cout << (pid == 1 ? "●" : "○");
     if (p[pid - 1]->getType() == 0) {
-        cout << "玩家" << (int)pid << "赢了! " << endl;
-    } else {
         cout << "电脑赢了！" << endl;
+    } else {
+        cout << "玩家" << (int)pid << "赢了! " << endl;
     }
     
 } // 提示游戏结束，展示胜者或平局

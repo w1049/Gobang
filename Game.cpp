@@ -30,12 +30,12 @@ void Game::start() {
     displayPad();
     while (1) {
         int code = 0;
-        if (!p[turn - 1]->getType()) {
+        if (p[turn - 1]->getType()) {
             info(turn);
             code = p[turn - 1]->command(*chessPad);
             if (code == 1) { // undo
                 if (!undo()) continue;
-                if (p[turn - 1]->getType()) if (!undo()) continue;
+                if (p[turn - 1]->getType() == 0 || p[turn - 1]->getType() == 2 || p[2 - turn]->getType() == 2) if (!undo()) continue;
             }
             else if (code == 2) { // ask
                 AIPlayer ai = AIPlayer(turn);
