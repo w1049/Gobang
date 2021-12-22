@@ -2,6 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QMessageBox>
+#include <QtNetwork>
+#include <QtCore>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -18,8 +21,17 @@ public:
 
 private slots:
     void on_pushButton_clicked();
+    void on_pushButton_2_clicked();
+    void on_pushButton_3_clicked();
+
+    void on_pushButton_4_clicked();
 
 private:
     Ui::MainWindow *ui;
+    void initServer();
+    void connectClient();
+    void connectServer();
+    QTcpServer *tcpServer = nullptr;
+    void displayError(QAbstractSocket::SocketError socketError);
 };
 #endif  // MAINWINDOW_H

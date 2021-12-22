@@ -15,7 +15,7 @@ class GameWindow : public QWidget {
     Q_OBJECT
 
 public:
-    explicit GameWindow(int = 3, bool = 0, QWidget *parent = nullptr);
+    explicit GameWindow(int type, bool mode, QWidget *parent = nullptr);
     ~GameWindow();
     void upd(int = 0);
     void dealDone();
@@ -29,6 +29,11 @@ private slots:
     void on_pushButton_clicked();
     void on_pushButton_2_clicked();
     void on_pushButton_3_clicked();
+
+public slots: // private?
+    void readData();
+    void sendData();
+    void readDataClient();
 
 private:
     Ui::GameWindow *ui;

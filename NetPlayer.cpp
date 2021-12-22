@@ -1,66 +1,57 @@
-/*
 #include "NetPlayer.h"
 
-#include <iostream>
-#include <sstream>
-#include <string>
+#include <QDebug>
+#include <QDataStream>
+#include <QTcpSocket>
 
 #include "ChessPiece.h"
 
-using std::endl;
-using std::stringstream;
+NetPlayer::NetPlayer(int p) : Player(p, 3), Tx(0), Ty(0) {}
 
-extern char recv_char[256];
-void send_v(const SOCKET* sock, std::string str);
-void recv_v(const SOCKET* sock);
-
-NetPlayer::NetPlayer(int p, SOCKET* sock): Player(p, 2), Tx(0), Ty(0),
-sock(sock) {}
-
-ChessPiece NetPlayer::getNextPiece(const ChessPad& pad) {
+ChessPiece NetPlayer::getNextPiece(const ChessPad&) {
     return ChessPiece(pid, Tx, Ty);
 }
+namespace GameServer {
+extern QTcpSocket *clientConnection;
+}
 
-void NetPlayer::infoFailed(const ChessPiece &p, int reason) {
-    stringstream s;
-    s << "由于原因" << reason << ", 你不能在" << char(p.getY() + 'A') <<
-(int)p.getX() + 1 << "下棋." << endl; send_v(sock, s.str());
+using namespace GameServer;
+void NetPlayer::infoFailed(const ChessPiece& p, int reason) {
+    QByteArray block;
+    QDataStream out(&block, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_5_10);
+    out << RETRY;
+    clientConnection->write(block);
+    // qDebug() << "由于原因" << (int)reason << ", 你不能在" << char(p.getY() +
+    // 'A') << (int)p.getX() + 1 << "下棋." << '\n';
 }
 // ask
 // undo
 // H8
 int NetPlayer::command(const ChessPad& pad) {
     ChessPiece p;
-    int8_t reason;
+    int reason;
     while (1) {
-        std::stringstream sss;
-        sss << "轮到" << (pid == 1 ? "●" : "○") <<
-"方下棋。请输入坐标，形式为“A8”（不含引号）: " << endl; send_v(sock, sss.str());
-        char cy;  int x;
-        recv_v(sock);
-        std::string str(recv_char);
-        if (str == "undo") return 1;
-        else if (str == "ask") return 2;
-        std::stringstream ss(str);
-        ss >> cy;
-        if ('a' <= cy && cy <= 'z') cy -= 'a';
-        else if ('A' <= cy && cy <= 'Z') cy -= 'A';
-        else continue;
-        if (!isdigit(str[1])) continue;
-        ss >> x;
-        if (ss.fail() || x < 1 || x > 15 || cy < 0 || cy >= 15) continue;
-        if (reason = pad.checkState(p.set(pid, x - 1, cy))) {
-            infoFailed(p, reason);
+        mutex.lock();
+        hasCmd.wait(&mutex); // wait for recieve
+        if (cmd == 1) {
+            mutex.unlock();
+            return 1;
+        } else if (cmd == 2) {
+            mutex.unlock();
+            return 2;
         }
-        else {
-            Tx = p.getX(), Ty = p.getY();
+        reason = pad.checkState(p.set(pid, Tx, Ty));
+        if (reason == 1 || reason == 2) {
+            infoFailed(p, reason);
+            mutex.unlock();
+        } else if (reason == 3 || reason == 4 || reason == 5) {
+            mutex.unlock();
+            return 3;
+        } else {
+            mutex.unlock();
             break;
         }
     }
     return 0;
 }
-
-const SOCKET* NetPlayer::getSock() {
-    return sock;
-}
-*/

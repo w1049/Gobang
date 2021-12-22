@@ -9,6 +9,7 @@
 #include <vector>
 
 typedef signed char int8_t;
+typedef unsigned char uint8_t;
 
 const int INF = 1000000007;
 
@@ -25,6 +26,17 @@ enum ChessType {
     DIE2,
     NOTHREAT
 };
+
+namespace GameServer {
+const int8_t REMOVE = 1;
+const int8_t RECOMMEND = 2;
+const int8_t TIPS = 3;
+const int8_t GAMEOVER = 4;
+const int8_t PLACE = 5;
+const int8_t RETRY = 6;
+const int8_t CLICK = 7;
+const int8_t COMMAND = 8;
+}
 
 class ChessPiece {
 private:

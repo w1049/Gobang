@@ -4,6 +4,9 @@
 #include <QMutex>
 #include <QThread>
 #include <string>
+#include "NetPlayer.h"
+#include "QtNetGame.h"
+#include <QDebug>
 
 #include "mainwindow.h"
 #include "mythread.h"
@@ -12,6 +15,7 @@
 #include "qpainter.h"
 #include "qpen.h"
 #include "ui_gamewindow.h"
+#include "QtGameClient.h"
 namespace render {
 QtGame *runningGame;
 QtPlayer *currentPlayer;
@@ -27,6 +31,15 @@ MyThread *pro;
 int currentPid;
 }  // namespace render
 using namespace render;
+namespace GameServer {
+extern QTcpSocket *clientConnection;
+NetPlayer *remotePlayer;
+extern QDataStream in;
+QByteArray sendBlock;
+QMutex blockMutex;
+QtGameClient clientCtrl;
+}
+using namespace GameServer;
 void GameWindow::upd(int pid) {
     if (pid && pid != currentPid) {
         // 回合结束
@@ -50,7 +63,7 @@ void GameWindow::dealDone() {
         str = "电脑赢了！";
     else
         str = "玩家" + QString::number(winnerid) + "赢了! ";
-    QMessageBox::information(NULL, "游戏结束", str, QMessageBox::Yes,
+    QMessageBox::information(this, "游戏结束", str, QMessageBox::Yes,
                              QMessageBox::Yes);
 }
 
@@ -58,9 +71,24 @@ GameWindow::GameWindow(int type, bool mode, QWidget *parent)
     : QWidget(parent), ui(new Ui::GameWindow), type(type), mode(mode) {
     ui->setupUi(this);
     setMouseTracking(true);
-    pro = new MyThread();
-    connect(pro, &MyThread::isDone, this, &GameWindow::dealDone);
-    connect(this, &GameWindow::destroyed, this, &GameWindow::stopThread);
+    if (type < 6) {
+        pro = new MyThread();
+        connect(pro, &MyThread::isDone, this, &GameWindow::dealDone);
+        connect(this, &GameWindow::destroyed, this, &GameWindow::stopThread);
+    } else {
+        ui->pushButton->setDisabled(true);
+        switch(type) {
+        case 6:
+            currentPlayer = nullptr;
+            //waitPlayer = dynamic_cast<QtPlayer *>(runningGame->p[1]);
+            break;
+        case 7:
+            //currentPlayer = dynamic_cast<QtPlayer *>(runningGame->p[0]);
+            waitPlayer = nullptr;
+            break;
+        }
+        currentPid = 1;
+    }
 }
 
 void GameWindow::paintEvent(QPaintEvent *) {
@@ -201,22 +229,36 @@ void GameWindow::stopThread() {
 
 GameWindow::~GameWindow() {
     delete ui;
-    disconnect(pro, &MyThread::isDone, this, &GameWindow::dealDone);
+    // disconnect(pro, &MyThread::isDone, this, &GameWindow::dealDone);
     disconnect(this, &GameWindow::destroyed, this, &GameWindow::stopThread);
 }
 
 void GameWindow::on_pushButton_clicked() {
-    runningGame = new QtGame(type, mode);
     switch (type) {
     case 1:
+        runningGame = new QtGame(1, mode);
         currentPlayer = dynamic_cast<QtPlayer *>(runningGame->p[0]);
         waitPlayer = nullptr;
         break;
     case 2:
+        runningGame = new QtGame(2, mode);
         currentPlayer = nullptr;
         waitPlayer = dynamic_cast<QtPlayer *>(runningGame->p[1]);
         break;
-    default:
+    case 4:
+        runningGame = new QtNetGame(1, mode);
+        currentPlayer = dynamic_cast<QtPlayer *>(runningGame->p[0]);
+        waitPlayer = nullptr;
+        remotePlayer = dynamic_cast<NetPlayer *>(runningGame->p[1]);
+        break;
+    case 5:
+        runningGame = new QtNetGame(2, mode);
+        currentPlayer = nullptr;
+        waitPlayer = dynamic_cast<QtPlayer *>(runningGame->p[1]);
+        remotePlayer = dynamic_cast<NetPlayer *>(runningGame->p[0]);
+        break;
+    case 3:
+        runningGame = new QtGame(3, mode);
         currentPlayer = dynamic_cast<QtPlayer *>(runningGame->p[0]);
         waitPlayer = dynamic_cast<QtPlayer *>(runningGame->p[1]);
         break;
@@ -240,4 +282,44 @@ void GameWindow::on_pushButton_3_clicked() {
     currentPlayer->cmd = 2;
     currentPlayer->hasCmd.wakeAll();
     currentPlayer->mutex.unlock();
+}
+
+void GameWindow::readData() {
+    if (!remotePlayer) return;
+    int8_t c;
+    in >> c;
+    remotePlayer->mutex.lock();
+    if (c == COMMAND) {
+        in >> remotePlayer->cmd;
+        remotePlayer->hasCmd.wakeAll();
+    } else if (c == CLICK) {
+        remotePlayer->cmd = 0;
+        in >> remotePlayer->Tx;
+        in >> remotePlayer->Ty;
+        remotePlayer->hasCmd.wakeAll();
+    }
+    remotePlayer->mutex.unlock();
+}
+
+void GameWindow::sendData() {
+    blockMutex.lock();
+        qDebug() << sendBlock;
+    clientConnection->write(sendBlock);
+    blockMutex.unlock();
+}
+
+void GameWindow::readDataClient() {
+    int8_t c;
+    in >> c;
+    qDebug() << (int)c;
+    clientCtrl.run(c, in);
+    if (c == 4) {
+        QString str;
+        if (winnerid == 3)
+            str = "平局！";
+        else
+            str = "玩家" + QString::number(winnerid) + "赢了! ";
+        QMessageBox::information(this, "游戏结束", str, QMessageBox::Yes,
+                                 QMessageBox::Yes);
+    }
 }

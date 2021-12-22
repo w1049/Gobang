@@ -16,6 +16,9 @@ extern int points;
 }  // namespace render
 using namespace render;
 
+class GameWindow;
+extern GameWindow* GW;
+
 QtGame::QtGame(int type, bool mode) {
     switch (type) {
     case 1:
@@ -32,6 +35,7 @@ QtGame::QtGame(int type, bool mode) {
         break;
     }
     chessPad = new ChessPad(mode);
+    connect(this, &QtGame::upd, GW, &GameWindow::upd);
 }
 
 void QtGame::start() {
@@ -57,23 +61,20 @@ void QtGame::start() {
     }
 }
 
-class GameWindow;
-extern GameWindow* GW;
-
 void QtGame::infoRemove() {
     drawmutex.lock();
     currentPad.remove();
     banned.clear();
     win5.clear();
     rcmd.set(0, -1, -1);
-    GW->upd(turn);  // 提示改变回合
+    emit upd(turn);  // 提示改变回合
     drawmutex.unlock();
 }
 
 void QtGame::infoRecommend(const ChessPiece& p) {
     drawmutex.lock();
     rcmd = p;
-    GW->upd();
+    emit upd(0);
     drawmutex.unlock();
 }
 
@@ -94,7 +95,7 @@ void QtGame::infoTips(int pid) {
                 chessPad->judgeWinner(p))
                 win5.push_back(p);
         }
-    GW->upd();
+    emit upd(0);
     drawmutex.unlock();
 }
 
@@ -106,6 +107,6 @@ void QtGame::infoPlace(const ChessPiece& p) {
     banned.clear();
     win5.clear();
     rcmd.set(0, -1, -1);
-    GW->upd(3 - turn);  // 提示改变回合
+    emit upd(3 - turn);  // 提示改变回合
     drawmutex.unlock();
 }

@@ -1,17 +1,18 @@
-#ifndef __QT_GAME_H__
-#define __QT_GAME_H__
+#ifndef __QT_NET_GAME_H__
+#define __QT_NET_GAME_H__
 
-#include "Game.h"
-#include <QtCore>
+#include "QtGame.h"
+#include <QDialog>
+#include <QTcpServer>
+#include <QTcpSocket>
 
-class QtGame : public QObject, public Game {
+class QtNetGame : public QtGame {
     Q_OBJECT
     friend class GameWindow;
     friend class MainWindow;
 
 public:
-    QtGame() = default;
-    QtGame(int, bool);
+    QtNetGame(int, bool);
     void start();
     void infoTips(int);
     void infoRecommend(const ChessPiece&);
@@ -20,7 +21,8 @@ public:
     void infoRemove();
 
 signals:
-    void upd(int x);
+    void sendData();
+
 };
 
 #endif

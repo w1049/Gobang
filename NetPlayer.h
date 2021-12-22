@@ -1,23 +1,23 @@
-/*
- * #ifndef __NET_PLAYER_H__
+#ifndef __NET_PLAYER_H__
 #define __NET_PLAYER_H__
 
-#include <winsock.h>
+#include <qmutex.h>
+#include <qwaitcondition.h>
 
 #include "ChessPad.h"
 #include "Player.h"
 
 class NetPlayer : public Player {
 public:
-    NetPlayer(int, SOCKET*);
+    NetPlayer(int);
     ChessPiece getNextPiece(const ChessPad&);
     void infoFailed(const ChessPiece&, int);
     int command(const ChessPad&);
-    const SOCKET* getSock();
-private:
     int8_t Tx, Ty;
-    SOCKET* sock;
+    int cmd = -1;
+    QMutex mutex;
+    QWaitCondition hasCmd;
+    // private:
 };
 
 #endif
-*/

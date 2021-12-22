@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -20,6 +20,8 @@ SOURCES += \
     OldMain.cpp \
     Player.cpp \
     QtGame.cpp \
+    QtGameClient.cpp \
+    QtNetGame.cpp \
     QtPlayer.cpp \
     gamewindow.cpp \
     main.cpp \
@@ -37,6 +39,8 @@ HEADERS += \
     NetPlayer.h \
     Player.h \
     QtGame.h \
+    QtGameClient.h \
+    QtNetGame.h \
     QtPlayer.h \
     gamewindow.h \
     mainwindow.h \
