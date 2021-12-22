@@ -37,7 +37,9 @@ NetPlayer *remotePlayer;
 extern QDataStream in;
 QByteArray sendBlock;
 QMutex blockMutex;
+QWaitCondition blockCond;
 QtGameClient clientCtrl;
+extern QTcpSocket *tcpSocket;
 }
 using namespace GameServer;
 void GameWindow::upd(int pid) {
@@ -45,9 +47,18 @@ void GameWindow::upd(int pid) {
         // 回合结束
         currentPid = pid;
         std::swap(currentPlayer, waitPlayer);
+        if (currentPlayer) {
+            ui->pushButton_2->setEnabled(true);
+            ui->pushButton_3->setEnabled(true);
+        } else {
+            ui->pushButton_2->setDisabled(true);
+            ui->pushButton_3->setDisabled(true);
+        }
     }
     update();
 }
+// 数据完整性检验
+// 模式选择
 
 void GameWindow::dealDone() {
     ui->pushButton_2->setDisabled(true);
@@ -80,10 +91,10 @@ GameWindow::GameWindow(int type, bool mode, QWidget *parent)
         switch(type) {
         case 6:
             currentPlayer = nullptr;
-            //waitPlayer = dynamic_cast<QtPlayer *>(runningGame->p[1]);
+            waitPlayer = new QtPlayer(2);// dynamic_cast<QtPlayer *>(runningGame->p[1]);
             break;
         case 7:
-            //currentPlayer = dynamic_cast<QtPlayer *>(runningGame->p[0]);
+            currentPlayer = new QtPlayer(1);// dynamic_cast<QtPlayer *>(runningGame->p[0]);
             waitPlayer = nullptr;
             break;
         }
@@ -211,14 +222,24 @@ void GameWindow::mouseMoveEvent(QMouseEvent *event) {
     update();
 }
 
+QDataStream& operator<<(QDataStream&, const ChessPiece&);
+
 void GameWindow::mouseReleaseEvent(QMouseEvent *) {
     if (!currentPlayer) return;
-    currentPlayer->mutex.lock();
-    currentPlayer->cmd = 0;
-    currentPlayer->Tx = moveX;
-    currentPlayer->Ty = moveY;
-    currentPlayer->hasCmd.wakeAll();
-    currentPlayer->mutex.unlock();
+    if (runningGame) {
+        currentPlayer->mutex.lock();
+        currentPlayer->cmd = 0;
+        currentPlayer->Tx = moveX;
+        currentPlayer->Ty = moveY;
+        currentPlayer->hasCmd.wakeAll();
+        currentPlayer->mutex.unlock();
+    } else {
+        sendBlock.clear();
+        QDataStream out(&sendBlock, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_5_10);
+        out << CLICK << (int8_t)moveX << (int8_t)moveY;
+        tcpSocket->write(sendBlock);
+    }
 }
 
 void GameWindow::stopThread() {
@@ -270,18 +291,34 @@ void GameWindow::on_pushButton_clicked() {
 
 void GameWindow::on_pushButton_2_clicked() {
     if (!currentPlayer) return;
-    currentPlayer->mutex.lock();
-    currentPlayer->cmd = 1;
-    currentPlayer->hasCmd.wakeAll();
-    currentPlayer->mutex.unlock();
+    if (runningGame) {
+        currentPlayer->mutex.lock();
+        currentPlayer->cmd = 1;
+        currentPlayer->hasCmd.wakeAll();
+        currentPlayer->mutex.unlock();
+    } else {
+        sendBlock.clear();
+        QDataStream out(&sendBlock, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_5_10);
+        out << COMMAND << 1;
+        tcpSocket->write(sendBlock);
+    }
 }
 
 void GameWindow::on_pushButton_3_clicked() {
     if (!currentPlayer) return;
-    currentPlayer->mutex.lock();
-    currentPlayer->cmd = 2;
-    currentPlayer->hasCmd.wakeAll();
-    currentPlayer->mutex.unlock();
+    if (runningGame) {
+        currentPlayer->mutex.lock();
+        currentPlayer->cmd = 2;
+        currentPlayer->hasCmd.wakeAll();
+        currentPlayer->mutex.unlock();
+    } else {
+        sendBlock.clear();
+        QDataStream out(&sendBlock, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_5_10);
+        out << COMMAND << 2;
+        tcpSocket->write(sendBlock);
+    }
 }
 
 void GameWindow::readData() {
@@ -303,17 +340,30 @@ void GameWindow::readData() {
 
 void GameWindow::sendData() {
     blockMutex.lock();
-        qDebug() << sendBlock;
+    qDebug() << sendBlock;
     clientConnection->write(sendBlock);
+    clientConnection->flush();
+    blockCond.wakeAll();
     blockMutex.unlock();
 }
 
+int blockSize = 0;
 void GameWindow::readDataClient() {
+    if (blockSize == 0) {
+           if(tcpSocket->bytesAvailable() < (int)sizeof(quint16)) return;
+           in >> blockSize;
+        }
+    if(tcpSocket->bytesAvailable() < blockSize) return;
+
     int8_t c;
     in >> c;
     qDebug() << (int)c;
     clientCtrl.run(c, in);
-    if (c == 4) {
+    if (c == GAMEOVER) {
+        ui->pushButton_2->setDisabled(true);
+        ui->pushButton_3->setDisabled(true);
+        if (currentPlayer) delete currentPlayer;
+        if (waitPlayer) delete waitPlayer;
         QString str;
         if (winnerid == 3)
             str = "平局！";
@@ -322,4 +372,5 @@ void GameWindow::readDataClient() {
         QMessageBox::information(this, "游戏结束", str, QMessageBox::Yes,
                                  QMessageBox::Yes);
     }
+    blockSize = 0;
 }

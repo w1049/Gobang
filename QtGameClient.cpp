@@ -33,7 +33,7 @@ void QtGameClient::run(int8_t c, QDataStream& in) {
 }
 
 void QtGameClient::infoRemove(QDataStream& in) {
-    int turn;
+    int8_t turn;
     in >> turn;
     // drawmutex.lock();
     currentPad.remove();
@@ -70,12 +70,14 @@ void QtGameClient::infoTips(QDataStream& in) {
 }
 
 void QtGameClient::infoGameOver(QDataStream& in) {
-    in >> winnerid;
+    int8_t id;
+    in >> id;
+    winnerid = id;
 }
 
 void QtGameClient::infoPlace(QDataStream& in) {
     ChessPiece p;
-    int turn;
+    int8_t turn;
     in >> p >> turn;
     // drawmutex.lock();
     currentPad.place(p);

@@ -17,11 +17,6 @@ extern QTcpSocket *clientConnection;
 
 using namespace GameServer;
 void NetPlayer::infoFailed(const ChessPiece& p, int reason) {
-    QByteArray block;
-    QDataStream out(&block, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_10);
-    out << RETRY;
-    clientConnection->write(block);
     // qDebug() << "由于原因" << (int)reason << ", 你不能在" << char(p.getY() +
     // 'A') << (int)p.getX() + 1 << "下棋." << '\n';
 }

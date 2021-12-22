@@ -33,9 +33,8 @@ const int8_t RECOMMEND = 2;
 const int8_t TIPS = 3;
 const int8_t GAMEOVER = 4;
 const int8_t PLACE = 5;
-const int8_t RETRY = 6;
-const int8_t CLICK = 7;
-const int8_t COMMAND = 8;
+const int8_t CLICK = 6;
+const int8_t COMMAND = 7;
 }
 
 class ChessPiece {

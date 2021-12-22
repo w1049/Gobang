@@ -23,6 +23,7 @@ extern GameWindow* GW;
 namespace GameServer {
 extern QByteArray sendBlock;
 extern QMutex blockMutex;
+extern QWaitCondition blockCond;
 }
 using namespace GameServer;
 
@@ -30,7 +31,7 @@ QtNetGame::QtNetGame(int type, bool mode) {
     switch (type) {
     case 1:
         p[0] = new QtPlayer(1);
-        p[1] = new AIPlayer(2);//NetPlayer(2);
+        p[1] = new NetPlayer(2);
         break;
     case 2:
         p[0] = new NetPlayer(1);
@@ -84,8 +85,9 @@ void QtNetGame::infoRemove() {
     sendBlock.clear();
     QDataStream out(&sendBlock, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_10);
-    out << REMOVE << turn;
+    out << REMOVE << (int8_t)turn;
     emit sendData();
+    blockCond.wait(&blockMutex);
     blockMutex.unlock();
 
     drawmutex.lock();
@@ -100,7 +102,7 @@ void QtNetGame::infoRemove() {
 void QtNetGame::infoRecommend(const ChessPiece& p) {
     //send recommend
     //send p
-    blockMutex.unlock();
+
     if (this->p[p.getPid() - 1]->getType() == 1) {
         drawmutex.lock();
         rcmd = p;
@@ -113,6 +115,8 @@ void QtNetGame::infoRecommend(const ChessPiece& p) {
         out.setVersion(QDataStream::Qt_5_10);
         out << RECOMMEND << p;
         emit sendData();
+        blockCond.wait(&blockMutex);
+        blockMutex.unlock();
     }
 }
 
@@ -156,6 +160,7 @@ void QtNetGame::infoTips(int pid) {
         out << (uint8_t)win5.size();
         for (auto p : win5) out << p;
         emit sendData();
+        blockCond.wait(&blockMutex);
         blockMutex.unlock();
     }
 }
@@ -168,8 +173,9 @@ void QtNetGame::infoGameOver(int pid) {
     QDataStream out(&sendBlock, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_10);
     qDebug() << "infoGameOver" << pid;
-    out << GAMEOVER << pid;
+    out << GAMEOVER << (int8_t)pid;
     emit sendData();
+    blockCond.wait(&blockMutex);
     blockMutex.unlock();
 
     winnerid = pid;
@@ -183,9 +189,10 @@ void QtNetGame::infoPlace(const ChessPiece& p) {
     sendBlock.clear();
     QDataStream out(&sendBlock, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_10);
-
-    out << PLACE << p << turn;
+    out << PLACE << p << (int8_t)turn;
+    qDebug() << p.getX() << p.getY();
     emit sendData();
+    blockCond.wait(&blockMutex);
     blockMutex.unlock();
 
     drawmutex.lock();
