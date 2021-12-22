@@ -1,5 +1,4 @@
 #include <iostream>
-#include <string>
 #include <sstream>
 
 #include "CmdPlayer.h"
@@ -11,12 +10,12 @@ using std::endl;
 
 CmdPlayer::CmdPlayer(int p): Player(p, 1), Tx(0), Ty(0) {}
 
-ChessPiece CmdPlayer::getNextPos(const ChessPad& pad) {
+ChessPiece CmdPlayer::getNextPiece(const ChessPad&) {
     return ChessPiece(pid, Tx, Ty);
 }
 
-void CmdPlayer::infoFailed(const ChessPiece &p, int8_t reason) {
-    cout << "ÓÉÓÚÔ­Òò" << (int)reason << ", Äã²»ÄÜÔÚ" << char(p.getY() + 'A') << (int)p.getX() + 1 << "ÏÂÆå." << endl;
+void CmdPlayer::infoFailed(const ChessPiece &p, int reason) {
+    cout << "ç”±äºŽåŽŸå› " << reason << ", ä½ ä¸èƒ½åœ¨" << char(p.getY() + 'A') << (int)p.getX() + 1 << "ä¸‹æ£‹." << endl;
 }
 // ask
 // undo
@@ -25,7 +24,7 @@ int CmdPlayer::command(const ChessPad& pad) {
     ChessPiece p;
     int8_t reason;
     while (1) {
-        cout << "ÂÖµ½" << (pid == 1 ? "¡ñ" : "¡ð") << "·½ÏÂÆå¡£ÇëÊäÈë×ø±ê£¬ÐÎÊ½Îª¡°A8¡±£¨²»º¬ÒýºÅ£©: " << endl;
+        cout << "è½®åˆ°" << (pid == 1 ? "â—" : "â—‹") << "æ–¹ä¸‹æ£‹ã€‚è¯·è¾“å…¥åæ ‡ï¼Œå½¢å¼ä¸ºâ€œA8â€ï¼ˆä¸å«å¼•å·ï¼‰: " << endl;
         char cy;  int x;
         std::string str;
         cin.clear(); cin.sync();
@@ -40,7 +39,7 @@ int CmdPlayer::command(const ChessPad& pad) {
         if (!isdigit(str[1])) continue;
         ss >> x;
         if (ss.fail() || x < 1 || x > 15 || cy < 0 || cy >= 15) continue;
-        if (reason = pad.check(p.set(pid, x - 1, cy))) {
+        if (reason = pad.checkState(p.set(pid, x - 1, cy))) {
             infoFailed(p, reason);
         }
         else {

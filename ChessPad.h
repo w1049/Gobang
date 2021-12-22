@@ -1,34 +1,34 @@
 #ifndef __CHESS_PAD_H__
 #define __CHESS_PAD_H__
 
-#include <vector>
-
 #include "ChessPiece.h"
+using std::array;
 
 class ChessPad {
 private:
-    int8_t pad[15][15]; // ÆåÅÌ
-    // cpv piece[2]; // Æå×Ó; ÏÂÆåË³Ğò
-    cpv list;
-    int isBanned(const ChessPiece&) const;
-    const static int8_t dx[4], dy[4];
-    int8_t mode; // ½ûÊÖÄ£Ê½ 0²»½û
+    array<array<int8_t, 15>, 15> pad {}; // æ£‹ç›˜
+    cpv PList; // ä¸‹å­é¡ºåº
+    int isBanned(const ChessPiece&) const; // åˆ¤æ–­æ˜¯å¦ç¦æ‰‹
+    const static int8_t dx[4], dy[4]; // å››ä¸ªæ–¹å‘
+    bool mode; // ç¦æ‰‹æ¨¡å¼ 0ä¸ºä¸ç¦æ‰‹
 public:
-    ChessPad(int);
-    ChessPad(const ChessPad&);
-    int getType(const ChessPiece&, int direc, int = 0) const;
+    ChessPad(bool); // æ˜¯å¦ç¦æ‰‹
+    // è·å–æ£‹å­ï¼ˆä¸å¿…çœŸçš„ä¸‹å­ï¼‰åœ¨æŸæ–¹å‘çš„ç±»å‹. bool è¡¨ç¤ºæ˜¯å¦åˆ¤æ–­é•¿è¿. å¦‚æœæ˜¯é•¿è¿ï¼Œè¿”å› INF
+    int getType(const ChessPiece&, int direc, bool = 0) const;
+    // è·å–ä»¥æ£‹å­ï¼ˆä¸å¿…çœŸçš„ä¸‹å­ï¼‰ä¸ºä¸­å¿ƒçš„ä¸€æ¡çº¿ï¼Œå­˜å…¥æ•°ç»„ä¸­
     void getLine(const ChessPiece&, int direc, int8_t[9]) const;
+    // æ ¹æ®çº¿åˆ¤æ–­ä¸­å¿ƒæ£‹å­çš„ç±»å‹. å¦‚æœæ˜¯é•¿è¿ï¼Œä¸­å¿ƒæ£‹å­å°†è¢«ç½®ä¸º0
     int getType(int8_t[9]) const;
+    // ä¸‹æ£‹å­ï¼Œä¸è®ºæ˜¯å¦åˆæ³•
     int place(const ChessPiece&);
-    // ÏÂÆå×Ó. ²»ÔÙÅĞ¶ÏÊÇ·ñºÏ·¨. µ÷ÓÃÇ°ÇëÏÈµ÷ÓÃcheck. ½ûÊÖÒ²¿ÉÇ¿ĞĞ·ÅÖÃ.(ÓÉGameÀà¾ö¶¨ÊÇ·ñ·ÅÖÃ£¬ÕâÀïÖ»ĞèÊµÏÖ·ÅÖÃ).
-    int check(const ChessPiece&) const;
-    // ÅĞ¶ÏÊÇ·ñ¿ÉÒÔ·ÅÖÃÆå×Ó. ·µ»ØÖµÎª0´ú±í¿ÉÒÔ·ÅÖÃ£¬1´ú±í¸ÃÎ»ÖÃÒÑÓĞÆå×Ó£¬2´ú±í¿ÉÒÔ·ÅÖÃ, µ«½ûÊÖ£¨Ôİ²»Çø·Ö½ûÊÖÔ­Òò£©.
-    int judge(const ChessPiece&) const;
-    // ÅĞ¶ÏÏÂÍê¸ÃÆå×ÓºóÊÇ·ñÊ¤Àû. ·µ»ØÖµÎª0±íÊ¾²»Ê¤Àû£¬1±íÊ¾Ê¤Àû£¬2±íÊ¾Æ½¾Ö.
-    int p(int8_t, int8_t) const;
-    const cpv& getPiece() const;
+    // ç§»é™¤æ£‹å­
     void remove();
-    int getMode();
+    // åˆ¤æ–­æ˜¯å¦å¯ä»¥æ”¾ç½®æ£‹å­. è¿”å›å€¼ä¸º0ä»£è¡¨å¯ä»¥æ”¾ç½®ï¼Œ1ä»£è¡¨è¯¥ä½ç½®å·²æœ‰æ£‹å­ï¼Œ2ä»£è¡¨å‡ºç•Œï¼Œï¼ˆå¼€å¯ç¦æ‰‹æ—¶ï¼‰3 4 5ä»£è¡¨å¯ä»¥æ”¾ç½®ï¼Œä½†ç¦æ‰‹
+    int checkState(const ChessPiece&) const;
+    // åˆ¤æ–­ä¸‹å®Œè¯¥æ£‹å­åæ˜¯å¦èƒœåˆ©ï¼ˆè¯¥æ£‹å­å·²ä¸‹ï¼‰. è¿”å›å€¼ä¸º0è¡¨ç¤ºä¸èƒœåˆ©ï¼Œ1è¡¨ç¤ºèƒœåˆ©
+    bool judgeWinner(const ChessPiece&) const;
+    int getByPos(int8_t, int8_t) const;
+    const cpv& getPiecesList() const;
 };
 
 #endif

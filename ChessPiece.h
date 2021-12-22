@@ -1,14 +1,18 @@
 #ifndef __CHESS_PIECE_H__
 #define __CHESS_PIECE_H__
 
+#include <cmath>
+#include <cstring>
+#include <algorithm>
+#include <string>
 #include <vector>
+#include <array>
 
-typedef unsigned char uint8_t;
 typedef signed char int8_t;
-typedef unsigned short uint16_t;
-typedef unsigned int uint32_t;
 
 const int INF = 1000000007;
+
+enum ChessType { WIN5, ALIVE4, DIE4, LOWDIE4, ALIVE3, TIAO3, DIE3, ALIVE2, LOWALIVE2, DIE2, NOTHREAT };
 
 class ChessPiece {
 private:
@@ -16,8 +20,7 @@ private:
     int8_t posX;
     int8_t posY;
 public:
-    ChessPiece() = default;
-    ChessPiece(int, int8_t, int8_t);
+    ChessPiece(int = 0, int8_t = -1, int8_t = -1);
     int getPid() const;
     int8_t getX() const;
     int8_t getY() const;

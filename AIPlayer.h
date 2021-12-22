@@ -7,36 +7,25 @@
 class AIPlayer : public Player {
 public:
     AIPlayer(int);
-    ChessPiece getNextPos(const ChessPad&);
+    ChessPiece getNextPiece(const ChessPad&);
 private:
-    // Âäµã·¶Î§
+    // è½ç‚¹èŒƒå›´
     int8_t r;
-    // ËÑË÷
-    int dfs(ChessPiece&, int, ChessPad&, int8_t, int = -INF, int = INF);
-    // ËÑË÷Éî¶È
+    // æœç´¢
+    int dfs(ChessPiece&, int, ChessPad&, int, int = -INF, int = INF);
+    // æœç´¢æ·±åº¦
     int depth;
 };
 namespace AI {
-    /**
-    * @brief Æô·¢Ê½ÆÀ¹Àº¯Êı£¬ÆÀ¹ÀÄ³Ò»¿ÕÎ»µÄÓÅÏÈ³Ì¶È
-    * @param[in] ÆåÅÌ
-    * @param[in] ¿ÕÎ»
-    * @return ÔÚ¿ÕÎ»ÏÂ×ÓµÄ·ÖÊı
-    */
+    // å¯å‘å¼è¯„ä¼°å‡½æ•°ï¼Œè¯„ä¼°æŸä¸€ç©ºä½çš„ä¼˜å…ˆç¨‹åº¦
     int evaluate(ChessPad&, const ChessPiece&);
-    /**
-    * @brief Éú³ÉÂäµã
-    * @param[in] chessPad ÆåÅÌ
-    * @param[in] v ±£´æ×ß·¨ËùÓÃ vector
-    * @param[in] pid ÏÖÔÚ½«ÒªÏÂ×ÓµÄÍæ¼Ò
-    * @param[in] r ÂäµãÓëÒÑÓĞÆå×ÓµÄ¾àÀë
-    */
-    void generate(ChessPad& chessPad, cpv& v, int8_t pid, int8_t r);
-    // ¼ÆËã pid µÄÔ­Ê¼¾ÖÊÆ·Ö
-    int f(int8_t, const ChessPad&, int[11]);
-    // pid ÏÂÍêÒ»²½Ö®ºó£¬¼ÆËã pid µÄ¾ÖÊÆ·Ö
-    int g(int8_t, const ChessPad&);
-    // µ¥Ò»Æå×ÓĞÎ³É¶àÖÖÆìĞÎÊ±£¬¶îÍâ»ñµÃ·ÖÊı
+    // ç”Ÿæˆè½ç‚¹ï¼Œv ä¸ºä¿å­˜èµ°æ³•æ‰€ç”¨ vectorï¼Œpid ä¸ºç°åœ¨å°†è¦ä¸‹å­çš„ç©å®¶
+    void generate(ChessPad& chessPad, cpv& v, int pid, int8_t r);
+    // è®¡ç®— pid çš„åŸå§‹å±€åŠ¿åˆ†
+    int f(int, const ChessPad&, int[11]);
+    // pid ä¸‹å®Œä¸€æ­¥ä¹‹åï¼Œè®¡ç®— pid çš„å±€åŠ¿åˆ†
+    int g(int, const ChessPad&);
+    // å•ä¸€æ£‹å­å½¢æˆå¤šç§æ——å½¢æ—¶ï¼Œé¢å¤–è·å¾—åˆ†æ•°
     int getExScore(int[]);
 }
 #endif

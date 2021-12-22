@@ -10,20 +10,19 @@ protected:
     ChessPad *chessPad;
     int turn = 1;
 public:
-    int step();
-    void start();
-    bool undo();
-    virtual void reco(const ChessPiece&) = 0;
-    virtual void info(int) = 0;
-    virtual void infoGameOver(int pid) = 0; // ÌáÊ¾ÓÎÏ·½áÊø£¬Õ¹Ê¾Ê¤Õß»òÆ½¾Ö
-    virtual void displayPad() = 0; // ÏÔÊ¾ÆåÅÌ. µÚÒ»´ÎÏÔÊ¾ÆåÅÌÊ±Ê¹ÓÃ.
-    virtual void refreshPad(const ChessPiece&) = 0; // Ë¢ĞÂÆåÅÌ. ½ö¸Ä±ä¸ö±ğÆå×Ó.
+    Game() = default;
+    // ä¸å…è®¸å¤åˆ¶
+    Game(const Game&) = delete;
+    Game& operator=(const Game&) = delete;
+    bool step(bool = 0); // æ£‹å±€å‰è¿›ä¸€æ­¥ï¼Œbool = 1 è¡¨ç¤ºç›´æ¥åˆ¤è´Ÿ
+    void start(); // æ£‹å±€å¼€å§‹ï¼Œä¸»ä½“å‡½æ•°
+    bool undo(); // æ‚”ä¸€æ­¥æ£‹
+    virtual void infoRecommend(const ChessPiece&) = 0; // æ¨èæ£‹å­
+    virtual void infoTips(int) = 0; // æ˜¾ç¤ºå±€åŠ¿åˆ†ç­‰
+    virtual void infoGameOver(int pid) = 0; // æç¤ºæ¸¸æˆç»“æŸï¼Œå±•ç¤ºèƒœè€…. è‹¥ pid = 3ï¼Œåˆ™å¹³å±€
+    virtual void infoPlace(const ChessPiece&) = 0; // åˆ·æ–°æ£‹ç›˜ï¼Œæ·»åŠ æ£‹å­
+    virtual void infoRemove(); // åˆ·æ–°æ£‹ç›˜ï¼Œç§»é™¤æ£‹å­
+    virtual ~Game();
 };
-
-// ÓÎÏ·Ö÷º¯Êı£¬¿ØÖÆÓÎÏ·Á÷³ÌÓë´ó²¿·ÖÊäÈëÊä³ö. ¾ßÌå²Î¼ûÓÎÏ·Á÷³Ì.
-// ¿Éµ÷ÓÃÁ½¸öPlayerÓëÒ»¸öClassPadÖĞµÄº¯Êı.
-// ¿Éµ÷ÓÃÏÂÃæµÄĞéº¯ÊıÀ´½øĞĞÊäÈëÊä³ö.
-// ÓÎÏ·½áÊøºóÖ±½Ó return. £¨ÒÔºóÔÙ¼Ó»ÚÆå£©
-
 
 #endif

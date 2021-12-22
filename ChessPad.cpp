@@ -1,110 +1,86 @@
-#include <vector>
-#include <cstring>
-#include <iostream>
 #include "ChessPad.h"
 
-enum ChessType { WIN5, ALIVE4, DIE4, LOWDIE4, ALIVE3, TIAO3, DIE3, ALIVE2, LOWALIVE2, DIE2, NOTHREAT };
 const int8_t ChessPad::dx[4] = { 0, 1, 1, 1 }, ChessPad::dy[4] = { 1, 0, 1, -1 };
 
-// ÏÂÆå×Ó. ²»ÔÙÅĞ¶ÏÊÇ·ñºÏ·¨. µ÷ÓÃÇ°ÇëÏÈµ÷ÓÃcheck. ½ûÊÖÒ²¿ÉÇ¿ĞĞ·ÅÖÃ.(ÓÉGameÀà¾ö¶¨ÊÇ·ñ·ÅÖÃ£¬ÕâÀïÖ»ĞèÊµÏÖ·ÅÖÃ).
+int ChessPad::getByPos(int8_t i, int8_t j) const {
+    return pad[i][j];
+}
+
+const cpv& ChessPad::getPiecesList() const {
+    return PList;
+}
+
+ChessPad::ChessPad(bool mode): mode(mode) {}
+
 int ChessPad::place(const ChessPiece &p) {
     pad[p.getX()][p.getY()] = p.getPid();
-    //pid=1ÏÈÊÖ,pid=2ºóÊÖ.
-    // piece[p.getPid()-1].push_back(p);
-    list.push_back(p);
+    PList.push_back(p);
     return 0;
 }
 
-// ÊÇ·ñ½ûÊÖ
 int ChessPad::isBanned(const ChessPiece &p) const {
-    bool ong = 0;
+    bool f = 0; // é•¿è¿
+    // ç™½æ£‹æ— ç¦æ‰‹
     if (p.getPid() == 2) return 0;
-    // ÅĞ¶Ï½ûÊÖ²¢·µ»Ø
+    // è®°å½•ä¸‹æ£‹åå°†ä¼šå½¢æˆçš„æ——å½¢
     int typ[11] = {};
     for (int i = 0, t; i < 4; i++) {
         t = getType(p, i, 1);
-        if (t == INF) ong = 1; // ³¤Á¬
+        if (t == INF) f = 1; // é•¿è¿
         else ++typ[t];
     }
-    if (ong && !typ[WIN5]) return 3;
-    if (typ[ALIVE3] + typ[TIAO3] >= 2) return 4; // 33
-    if (typ[DIE4] + typ[LOWDIE4] >= 2) return 5; // 44
+    if (f && !typ[WIN5]) return 3; // é•¿è¿ç¦æ‰‹. å¦‚æœåŒæ—¶æˆ5ï¼Œç¦æ‰‹å¤±æ•ˆ
+    if (typ[ALIVE3] + typ[TIAO3] >= 2) return 4; // 33ç¦æ‰‹
+    if (typ[DIE4] + typ[LOWDIE4] >= 2) return 5; // 44ç¦æ‰‹
     return 0;
 }
 
-// ÅĞ¶ÏÊÇ·ñ¿ÉÒÔ·ÅÖÃÆå×Ó. ·µ»ØÖµÎª0´ú±í¿ÉÒÔ·ÅÖÃ£¬1´ú±í¸ÃÎ»ÖÃÒÑÓĞÆå×Ó£¬2´ú±í³ö½ç£¬3 4 5´ú±í¿ÉÒÔ·ÅÖÃ£¬µ«½ûÊÖ.
-int ChessPad::check(const ChessPiece &p) const {
+int ChessPad::checkState(const ChessPiece &p) const {
     int8_t x = p.getX(), y = p.getY();
-    if (x < 0 || x >= 15 || y < 0 || y >= 15) return 2;
-    if (pad[x][y]) return 1;
-    if (mode) return isBanned(p);
+    if (x < 0 || x >= 15 || y < 0 || y >= 15) return 2; // å‡ºç•Œ
+    if (pad[x][y]) return 1; // é‡å 
+    if (mode) return isBanned(p); // ç¦æ‰‹
     return 0;
 }
 
-// ÅĞ¶ÏÏÂÍê¸ÃÆå×ÓºóÊÇ·ñÊ¤Àû.£¨¸ÃÆå×ÓÒÑÏÂ£©·µ»ØÖµÎª0±íÊ¾²»Ê¤Àû£¬1±íÊ¾Ê¤Àû£¬2±íÊ¾Æ½¾Ö.
-int ChessPad::judge(const ChessPiece &p) const {
+bool ChessPad::judgeWinner(const ChessPiece &p) const {
+    // ä»»ä¸€æ–¹å‘æˆ5å°±èµ¢
     for (int i = 0; i < 4; i++)
         if (getType(p, i) == WIN5) return 1;
     return 0;
 }
 
-int ChessPad::p(int8_t i, int8_t j) const {
-    return pad[i][j];
-}
-
-const cpv& ChessPad::getPiece() const {
-    // if (i >= 0 && i < 2) return piece[i];
-    return list;
-}
-
 void ChessPad::remove() {
-    // ChessPiece p = piece[pid - 1].back();
-    ChessPiece p = list.back();
-    // piece[pid - 1].pop_back();
-    list.pop_back();
+    ChessPiece p = PList.back();
+    PList.pop_back();
     pad[p.getX()][p.getY()] = 0;
 }
 
-ChessPad::ChessPad(int mode): mode(mode) {
-    memset(pad, 0, sizeof(pad));
-    // piece[0].clear();
-    // piece[1].clear();
-    list.clear();
-}
-
-ChessPad::ChessPad(const ChessPad& p) {
-    // piece[0] = p.piece[0];
-    // piece[1] = p.piece[1];
-    list = p.list;
-    memcpy(pad, p.pad, sizeof(pad));
-    mode = p.mode;
-    // std::cerr << "COPY\n";
-}
-int ChessPad::getMode() {
-    return mode;
-}
-int ChessPad::getType(const ChessPiece &p, int direc, int judgeLong) const {
-    // if (rec[p.getX()][p.getY()][direc]) return rec[p.getX()][p.getY()][direc];
+int ChessPad::getType(const ChessPiece &p, int direc, bool judgeLong) const {
     int8_t line[9] = {};
+    // å…ˆè·å–ä¸€æ¡çº¿
     getLine(p, direc, line);
-    int re = getType(line);
+    // åˆ¤æ–­ç±»å‹
+    int ret = getType(line);
+    // åˆ¤æ–­é•¿è¿
     if (judgeLong && !line[4]) return INF;
-//    std::cerr << re << " ";
-//    for (int i = 0; i < 9; i++) std::cerr << (int)line[i] << ",";
-//    std::cerr << std::endl;
-    return re;
+    return ret;
 }
 
 void ChessPad::getLine(const ChessPiece &p, int direc, int8_t line[9]) const {
+    int pid = p.getPid();
+    line[4] = pid; // ä¸­é—´ç›´æ¥æ”¾ä¸Š pid
     int8_t dx = ChessPad::dx[direc], dy = ChessPad::dy[direc];
-    int8_t x = p.getX(), y = p.getY();
-    int8_t pid = p.getPid(), cnt = 1;
-    line[4] = pid;
+
+    // æ­£å‘æ‰¾4ä¸ª
+    int8_t x = p.getX(), y = p.getY(); 
     x += dx, y += dy;
     for (int8_t c = 5; c < 9; c++)
         if (x >= 0 && x < 15 && y >= 0 && y < 15)
            line[c] = pad[x][y], x += dx, y += dy;
         else line[c] = 3 - pid;
+
+    // é€†å‘æ‰¾4ä¸ª
     x = p.getX(), y = p.getY();
     x -= dx, y -= dy;
     for (int8_t c = 3; c >= 0; c--)
@@ -113,120 +89,119 @@ void ChessPad::getLine(const ChessPiece &p, int direc, int8_t line[9]) const {
         else line[c] = 3 - pid;
 }
 
-// ÆìĞÎÅĞ¶Ï²Î¿¼£ºhttps://www.cnblogs.com/songdechiu/p/5768999.html
-
+// æ——å½¢åˆ¤æ–­å‚è€ƒï¼šhttps://www.cnblogs.com/songdechiu/p/5768999.html
 int ChessPad::getType(int8_t line[9]) const {
     int pid = line[4];
     int hid = 3 - pid;
-    int l, r;     //¿ªÊ¼ºÍÖĞĞÄÏß¶Ï¿ªµÄÎ»ÖÃ
-    int cnt = 1;  //ÖĞĞÄÏßÓĞ¶àÉÙ¸ö£¬³õÊ¼»¯
+    int l, r;     //å¼€å§‹å’Œä¸­å¿ƒçº¿æ–­å¼€çš„ä½ç½®
+    int cnt = 1;  //ä¸­å¿ƒçº¿æœ‰å¤šå°‘ä¸ªï¼Œåˆå§‹åŒ–
     for (int i = 1; i <= 4; i++)
         if (line[4 - i] == pid) cnt++;
         else {
-            l = 4 - i;  //±£´æ¶Ï¿ªÎ»ÖÃ
+            l = 4 - i;  //ä¿å­˜æ–­å¼€ä½ç½®
             break;
         }
     for (int i = 1; i <= 4; i++)
         if (line[4 + i] == pid) cnt++;
         else {
-            r = 4 + i;  //±£´æ¶Ï¿ªÎ»ÖÃ
+            r = 4 + i;  //ä¿å­˜æ–­å¼€ä½ç½®
             break;
         }
     if (cnt > 5) {
-        line[4] = 0; // ³¤Á¬
+        line[4] = 0; // é•¿è¿
         return WIN5;
     }
     if (cnt == 5) return WIN5;
     int cl = line[l], cr = line[r];  // cl := (cl == hid)
-    if (cnt == 4) {                       //ÖĞĞÄÏß4Á¬
-        if (!cl && !cr)                   //Á½±ß¶Ï¿ªÎ»ÖÃ¾ù¿Õ
-            return ALIVE4;                //»îËÄ
-        else if (cl == hid && cr == hid)  //Á½±ß¶Ï¿ªÎ»ÖÃ¾ù·Ç¿Õ
-            return NOTHREAT;              //Ã»ÓĞÍşĞ²
-        else if (!cl || !cr)              //Á½±ß¶Ï¿ªÎ»ÖÃÖ»ÓĞÒ»¸ö¿Õ
-            return DIE4;                  //ËÀËÄ
+    if (cnt == 4) {                       //ä¸­å¿ƒçº¿4è¿
+        if (!cl && !cr)                   //ä¸¤è¾¹æ–­å¼€ä½ç½®å‡ç©º
+            return ALIVE4;                //æ´»å››
+        else if (cl == hid && cr == hid)  //ä¸¤è¾¹æ–­å¼€ä½ç½®å‡éç©º
+            return NOTHREAT;              //æ²¡æœ‰å¨èƒ
+        else if (!cl || !cr)              //ä¸¤è¾¹æ–­å¼€ä½ç½®åªæœ‰ä¸€ä¸ªç©º
+            return DIE4;                  //æ­»å››
     }
-    if (cnt == 3) {        //ÖĞĞÄÏß3Á¬
-        if (!cl && !cr) {  //Á½±ß¶Ï¿ªÎ»ÖÃ¾ù¿Õ
-            if (line[l - 1] == hid && line[r + 1] == hid)  //¾ùÎª¶ÔÊÖÆå×Ó
+    if (cnt == 3) {        //ä¸­å¿ƒçº¿3è¿
+        if (!cl && !cr) {  //ä¸¤è¾¹æ–­å¼€ä½ç½®å‡ç©º
+            if (line[l - 1] == hid && line[r + 1] == hid)  //å‡ä¸ºå¯¹æ‰‹æ£‹å­
                 return DIE3;
-            else if (line[l - 1] == pid || line[r + 1] == pid)  //Ö»ÒªÒ»¸öÎª×Ô¼ºµÄÆå×Ó
+            else if (line[l - 1] == pid || line[r + 1] == pid)  //åªè¦ä¸€ä¸ªä¸ºè‡ªå·±çš„æ£‹å­
                 return LOWDIE4;
-            else if (!line[l - 1] || !line[r + 1])  //Ö»ÒªÓĞÒ»¸ö¿Õ
+            else if (!line[l - 1] || !line[r + 1])  //åªè¦æœ‰ä¸€ä¸ªç©º
                 return ALIVE3;
         }
-        else if (cl == hid && cr == hid) {  //Á½±ß¶Ï¿ªÎ»ÖÃ¾ù·Ç¿Õ
-            return NOTHREAT;                  //Ã»ÓĞÍşĞ²
+        else if (cl == hid && cr == hid) {  //ä¸¤è¾¹æ–­å¼€ä½ç½®å‡éç©º
+            return NOTHREAT;                  //æ²¡æœ‰å¨èƒ
         }
-        else if (!cl || !cr) {         //Á½±ß¶Ï¿ªÎ»ÖÃÖ»ÓĞÒ»¸ö¿Õ
-            if (cl == hid) {             //×ó±ß±»¶Ô·½¶Â×¡
-                if (line[r + 1] == hid)  //ÓÒ±ßÒ²±»¶Ô·½¶Â×¡
+        else if (!cl || !cr) {         //ä¸¤è¾¹æ–­å¼€ä½ç½®åªæœ‰ä¸€ä¸ªç©º
+            if (cl == hid) {             //å·¦è¾¹è¢«å¯¹æ–¹å µä½
+                if (line[r + 1] == hid)  //å³è¾¹ä¹Ÿè¢«å¯¹æ–¹å µä½
                     return NOTHREAT;
-                if (!line[r + 1])  //ÓÒ±ß¾ù¿Õ
+                if (!line[r + 1])  //å³è¾¹å‡ç©º
                     return DIE3;
                 if (line[r + 1] == pid) return LOWDIE4;
             }
-            if (cr == hid) {             //ÓÒ±ß±»¶Ô·½¶Â×¡
-                if (line[l - 1] == hid)  //×ó±ßÒ²±»¶Ô·½¶Â×¡
+            if (cr == hid) {             //å³è¾¹è¢«å¯¹æ–¹å µä½
+                if (line[l - 1] == hid)  //å·¦è¾¹ä¹Ÿè¢«å¯¹æ–¹å µä½
                     return NOTHREAT;
-                if (!line[l - 1])  //×ó±ß¾ù¿Õ
+                if (!line[l - 1])  //å·¦è¾¹å‡ç©º
                     return DIE3;
-                if (line[l - 1] == pid)  //×ó±ß»¹ÓĞ×Ô¼ºµÄÆå×Ó
+                if (line[l - 1] == pid)  //å·¦è¾¹è¿˜æœ‰è‡ªå·±çš„æ£‹å­
                     return LOWDIE4;
             }
         }
     }
-    if (cnt == 2) {        //ÖĞĞÄÏß2Á¬
-        if (!cl && !cr) {  //Á½±ß¶Ï¿ªÎ»ÖÃ¾ù¿Õ
-            if (!line[r + 1] && line[r + 2] == pid || !line[l - 1] && line[l - 2] == pid)
-                return DIE3;  //ËÀ3
+    if (cnt == 2) {        //ä¸­å¿ƒçº¿2è¿
+        if (!cl && !cr) {  //ä¸¤è¾¹æ–­å¼€ä½ç½®å‡ç©º
+            if ((!line[r + 1] && line[r + 2] == pid) || (!line[l - 1] && line[l - 2] == pid))
+                return DIE3;  //æ­»3
             else if (!line[l - 1] && !line[r + 1])
-                return ALIVE2;  //»î2
-            if (line[r + 1] == pid && line[r + 2] == hid || line[l - 1] == pid && line[l - 2] == hid)
-                return DIE3;  //ËÀ3
-            if (line[r + 1] == pid && line[r + 2] == pid || line[l - 1] == pid && line[l - 2] == pid)
-                return LOWDIE4;  //ËÀ4
-            if (line[r + 1] == pid && !line[r + 2] || line[l - 1] == pid && !line[l - 2])
-                return TIAO3;  //Ìø»î3
-                               //ÆäËûÇé¿öÔÚÏÂ±ß·µ»ØNOTHREAT
-            if (!line[l - 1] && line[r + 1] == hid || line[l - 1] == hid && !line[r + 1])
+                return ALIVE2;  //æ´»2
+            if ((line[r + 1] == pid && line[r + 2] == hid) || (line[l - 1] == pid && line[l - 2] == hid))
+                return DIE3;  //æ­»3
+            if ((line[r + 1] == pid && line[r + 2] == pid) || (line[l - 1] == pid && line[l - 2] == pid))
+                return LOWDIE4;  //æ­»4
+            if ((line[r + 1] == pid && !line[r + 2]) || (line[l - 1] == pid && !line[l - 2]))
+                return TIAO3;  //è·³æ´»3
+                               //å…¶ä»–æƒ…å†µåœ¨ä¸‹è¾¹è¿”å›NOTHREAT
+            if ((!line[l - 1] && line[r + 1] == hid) || (line[l - 1] == hid && !line[r + 1]))
                 return LOWALIVE2;
         }
-        else if (cl == hid && cr == hid) {  //Á½±ß¶Ï¿ªÎ»ÖÃ¾ù·Ç¿Õ
+        else if (cl == hid && cr == hid) {  //ä¸¤è¾¹æ–­å¼€ä½ç½®å‡éç©º
             return NOTHREAT;
         }
-        else if (!cl || !cr) {  //Á½±ß¶Ï¿ªÎ»ÖÃÖ»ÓĞÒ»¸ö¿Õ
-            if (cl == hid) {      //×ó±ß±»¶Ô·½¶Â×¡
-                if (line[r + 1] == hid || line[r + 2] == hid) {  //Ö»ÒªÓĞ¶Ô·½µÄÒ»¸öÆå×Ó
-                    return NOTHREAT;       //Ã»ÓĞÍşĞ²
+        else if (!cl || !cr) {  //ä¸¤è¾¹æ–­å¼€ä½ç½®åªæœ‰ä¸€ä¸ªç©º
+            if (cl == hid) {      //å·¦è¾¹è¢«å¯¹æ–¹å µä½
+                if (line[r + 1] == hid || line[r + 2] == hid) {  //åªè¦æœ‰å¯¹æ–¹çš„ä¸€ä¸ªæ£‹å­
+                    return NOTHREAT;       //æ²¡æœ‰å¨èƒ
                 }
-                else if (!line[r + 1] && !line[r + 2]) {  //¾ù¿Õ
-                    return DIE2;                            //ËÀ2
+                else if (!line[r + 1] && !line[r + 2]) {  //å‡ç©º
+                    return DIE2;                            //æ­»2
                 }
-                else if (line[r + 1] == pid && line[r + 2] == pid) {  //¾ùÎª×Ô¼ºµÄÆå×Ó
-                    return LOWDIE4;               //ËÀ4
+                else if (line[r + 1] == pid && line[r + 2] == pid) {  //å‡ä¸ºè‡ªå·±çš„æ£‹å­
+                    return LOWDIE4;               //æ­»4
                 }
-                else if (line[r + 1] == pid || line[r + 2] == pid) {  //Ö»ÓĞÒ»¸ö×Ô¼ºµÄÆå×Ó
-                    return DIE3;                  //ËÀ3
+                else if (line[r + 1] == pid || line[r + 2] == pid) {  //åªæœ‰ä¸€ä¸ªè‡ªå·±çš„æ£‹å­
+                    return DIE3;                  //æ­»3
                 }
             }
-            if (cr == hid) {  //ÓÒ±ß±»¶Ô·½¶Â×¡
-                if (line[l - 1] == hid || line[l - 2] == hid) {  //Ö»ÒªÓĞ¶Ô·½µÄÒ»¸öÆå×Ó
-                    return NOTHREAT;       //Ã»ÓĞÍşĞ²
+            if (cr == hid) {  //å³è¾¹è¢«å¯¹æ–¹å µä½
+                if (line[l - 1] == hid || line[l - 2] == hid) {  //åªè¦æœ‰å¯¹æ–¹çš„ä¸€ä¸ªæ£‹å­
+                    return NOTHREAT;       //æ²¡æœ‰å¨èƒ
                 }
-                else if (!line[l - 1] && !line[l - 2]) {  //¾ù¿Õ
-                    return DIE2;                            //ËÀ2
+                else if (!line[l - 1] && !line[l - 2]) {  //å‡ç©º
+                    return DIE2;                            //æ­»2
                 }
-                else if (line[l - 1] == pid && line[l - 2] == pid) {  //¾ùÎª×Ô¼ºµÄÆå×Ó
-                    return LOWDIE4;               //ËÀ4
+                else if (line[l - 1] == pid && line[l - 2] == pid) {  //å‡ä¸ºè‡ªå·±çš„æ£‹å­
+                    return LOWDIE4;               //æ­»4
                 }
-                else if (line[l - 1] == pid || line[l - 2] == pid) {  //Ö»ÓĞÒ»¸ö×Ô¼ºµÄÆå×Ó
-                    return DIE3;                  //ËÀ3
+                else if (line[l - 1] == pid || line[l - 2] == pid) {  //åªæœ‰ä¸€ä¸ªè‡ªå·±çš„æ£‹å­
+                    return DIE3;                  //æ­»3
                 }
             }
         }
     }
-    if (cnt == 1) {  //ÖĞĞÄÏß1Á¬
+    if (cnt == 1) {  //ä¸­å¿ƒçº¿1è¿
         if (!cl && line[l - 1] == pid && line[l - 2] == pid && line[l - 3] == pid)
             return LOWDIE4;
         if (!cr && line[r + 1] == pid && line[r + 2] == pid && line[r + 3] == pid)
@@ -255,7 +230,7 @@ int ChessPad::getType(int8_t line[9]) const {
             return LOWALIVE2;
         if (!cr && !line[r + 1] && line[r + 2] == pid && !line[r + 3] && !cl)
             return LOWALIVE2;
-        //ÆäÓàÔÚÏÂ±ß·µ»ØÃ»ÓĞÍşĞ²
+        //å…¶ä½™åœ¨ä¸‹è¾¹è¿”å›æ²¡æœ‰å¨èƒ
     }
-    return NOTHREAT;  //·µ»ØÃ»ÓĞÍşĞ²
+    return NOTHREAT;  //è¿”å›æ²¡æœ‰å¨èƒ
 }

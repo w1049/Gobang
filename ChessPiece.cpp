@@ -1,8 +1,6 @@
-#include <cmath>
-
 #include "ChessPiece.h"
 
-ChessPiece::ChessPiece(int pid = 0, int8_t posX = 0, int8_t posY = 0)
+ChessPiece::ChessPiece(int pid, int8_t posX, int8_t posY)
     : pid(pid), posX(posX), posY(posY) {}
 
 int ChessPiece::getPid() const { return pid; }

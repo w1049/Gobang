@@ -2,13 +2,21 @@
 #include "Player.h"
 #include "AIPlayer.h"
 
-int Game::step() {
-    ChessPiece tmp = p[turn - 1]->getNextPos(*chessPad);
+bool Game::step(bool lose) {
+    ChessPiece tmp = p[turn - 1]->getNextPiece(*chessPad);
     chessPad->place(tmp);
-    refreshPad(tmp);
-    int code = chessPad->judge(tmp);
+    infoPlace(tmp);
+    if (chessPad->getPiecesList().size() == 225) {
+        infoGameOver(3);
+        return 1;
+    }
+    int code = chessPad->judgeWinner(tmp);
     if (code) {
         infoGameOver(turn);
+        return 1;
+    }
+    if (lose) {
+        infoGameOver(3 - turn);
         return 1;
     }
     turn = 3 - turn;
@@ -16,46 +24,45 @@ int Game::step() {
 }
 
 bool Game::undo() {
-    if (chessPad->getPiece().empty()) {
+    if (chessPad->getPiecesList().empty()) {
         return 0;
     }
-    ChessPiece p = chessPad->getPiece().back();
+    ChessPiece p = chessPad->getPiecesList().back();
     turn = p.getPid();
     chessPad->remove();
-    displayPad();
+    infoRemove();
     return 1;
 }
 
+void Game::infoRemove() {
+    infoPlace(ChessPiece(0, -1, -1));
+}
+
 void Game::start() {
-    displayPad();
+    infoPlace(ChessPiece(0, -1, -1));
     while (1) {
         int code = 0;
         if (p[turn - 1]->getType()) {
-            info(turn);
+            infoTips(turn);
             code = p[turn - 1]->command(*chessPad);
             if (code == 1) { // undo
                 if (!undo()) continue;
                 if (p[turn - 1]->getType() == 0 || p[turn - 1]->getType() == 2 || p[2 - turn]->getType() == 2) if (!undo()) continue;
+                continue;
             }
             else if (code == 2) { // ask
-                AIPlayer ai = AIPlayer(turn);
-                ChessPiece p = ai.getNextPos(*chessPad);
-                reco(p);
+                AIPlayer ai(turn);
+                ChessPiece p = ai.getNextPiece(*chessPad);
+                infoRecommend(p);
+                continue;
             }
         }
-        if (code) continue;
-        code = step();
-        if (code) break;
+        if (step(code == 3)) break;
     }
 }
 
-    // virtual infoGameOver(int8_t pid) = 0; // 提示游戏结束，展示胜者或平局
-    // virtual infoPlaceFailed(ChessPiece, int8_t reason) = 0; // 提示无法放置棋子
-    // virtual displayPad() = 0; // 显示棋盘. 第一次显示棋盘时使用.
-    // virtual refreshPad() = 0; // 刷新棋盘. 仅改变个别棋子.
-
-
-// 游戏主函数，控制游戏流程与大部分输入输出. 具体参见游戏流程.
-// 可调用两个Player与一个ClassPad中的函数.
-// 可调用下面的虚函数来进行输入输出.
-// 游戏结束后直接 return. （以后再加悔棋）
+Game::~Game() {
+    delete p[0];
+    delete p[1];
+    delete chessPad;
+}

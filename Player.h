@@ -9,11 +9,15 @@ protected:
     int type;
 public:
     Player(int, int);
+    Player(const Player&) = delete;
+    Player& operator=(const Player&) = delete;
     int getPid();
     int getType();
-    // 传入当前情况, 获取下一步的位置. 对于玩家是等待一个输入, 对于AI是计算
-    virtual ChessPiece getNextPos(const ChessPad&) = 0;
+    // 浼犲叆褰撳墠鎯呭喌, 鑾峰彇涓嬩竴姝ョ殑浣嶇疆.
+    virtual ChessPiece getNextPiece(const ChessPad&) = 0;
+    // 鐜╁鍙兘杈撳叆鎸囦护
     virtual int command(const ChessPad&);
+    virtual ~Player();
 };
 
 #endif

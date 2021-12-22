@@ -10,6 +10,8 @@ int Player::getPid() {
 	return pid;
 }
 
-int Player::command(const ChessPad& chessPad) {
+int Player::command(const ChessPad&) {
 	return 0;
 }
+
+Player::~Player() {}
