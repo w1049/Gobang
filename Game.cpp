@@ -1,6 +1,7 @@
 #include "Game.h"
-#include "Player.h"
+
 #include "AIPlayer.h"
+#include "Player.h"
 
 bool Game::step(bool lose) {
     ChessPiece tmp = p[turn - 1]->getNextPiece(*chessPad);
@@ -34,9 +35,7 @@ bool Game::undo() {
     return 1;
 }
 
-void Game::infoRemove() {
-    infoPlace(ChessPiece(0, -1, -1));
-}
+void Game::infoRemove() { infoPlace(ChessPiece(0, -1, -1)); }
 
 void Game::start() {
     infoPlace(ChessPiece(0, -1, -1));
@@ -45,12 +44,13 @@ void Game::start() {
         if (p[turn - 1]->getType()) {
             infoTips(turn);
             code = p[turn - 1]->command(*chessPad);
-            if (code == 1) { // undo
+            if (code == 1) {  // undo
                 if (!undo()) continue;
-                if (p[turn - 1]->getType() == 0 || p[turn - 1]->getType() == 2 || p[2 - turn]->getType() == 2) if (!undo()) continue;
+                if (p[turn - 1]->getType() == 0 ||
+                    p[turn - 1]->getType() == 2 || p[2 - turn]->getType() == 2)
+                    if (!undo()) continue;
                 continue;
-            }
-            else if (code == 2) { // ask
+            } else if (code == 2) {  // ask
                 AIPlayer ai(turn);
                 ChessPiece p = ai.getNextPiece(*chessPad);
                 infoRecommend(p);

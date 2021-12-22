@@ -1,0 +1,44 @@
+#ifndef GAMEWINDOW_H
+#define GAMEWINDOW_H
+
+#include <QWidget>
+
+#include "ChessPad.h"
+#include "QtGame.h"
+#include "QtPlayer.h"
+
+namespace Ui {
+class GameWindow;
+}
+
+class GameWindow : public QWidget {
+    Q_OBJECT
+
+public:
+    explicit GameWindow(int = 3, bool = 0, QWidget *parent = nullptr);
+    ~GameWindow();
+    void upd(int = 0);
+    void dealDone();
+
+protected:
+    void paintEvent(QPaintEvent *);
+    void mouseMoveEvent(QMouseEvent *);
+    void mouseReleaseEvent(QMouseEvent *);
+
+private slots:
+    void on_pushButton_clicked();
+    void on_pushButton_2_clicked();
+    void on_pushButton_3_clicked();
+
+private:
+    Ui::GameWindow *ui;
+    int moveX = -1;
+    int moveY = -1;
+    int type, mode;
+    void drawPiece(QPainter &, QPen &, QBrush &, const ChessPiece &, int = 255);
+    void drawBanned(QPainter &, const ChessPiece &);
+    void drawWarn(QPainter &, const ChessPiece &);
+    void stopThread();
+};
+
+#endif  // GAMEWINDOW_H

@@ -1,9 +1,10 @@
-#include <iostream>
-#include <iomanip>
-
 #include "CmdGame.h"
-#include "CmdPlayer.h"
+
+#include <iomanip>
+#include <iostream>
+
 #include "AIPlayer.h"
+#include "CmdPlayer.h"
 
 using std::cin;
 using std::cout;
@@ -42,8 +43,9 @@ void CmdGame::infoTips(int pid) {
         }
     for (int8_t x = 0; x < 15; x++)
         for (int8_t y = 0; y < 15; y++) {
-            if(!chessPad->checkState(p.set(3 - pid, x, y)) &&
-                chessPad->judgeWinner(p)) win5.push_back(p);
+            if (!chessPad->checkState(p.set(3 - pid, x, y)) &&
+                chessPad->judgeWinner(p))
+                win5.push_back(p);
         }
     if (!banned.empty()) {
         cout << "警告：禁手点 ";
@@ -66,16 +68,19 @@ void CmdGame::infoGameOver(int pid) {
     } else {
         cout << "玩家" << (int)pid << "赢了! " << endl;
     }
-    
-} // 提示游戏结束，展示胜者或平局
+
+}  // 提示游戏结束，展示胜者或平局
 
 const char* toS(int x) {
-    if (x == 0) return "++ ";
-    else if (x == 1) return "● ";
-    else return "○ ";
+    if (x == 0)
+        return "++ ";
+    else if (x == 1)
+        return "● ";
+    else
+        return "○ ";
 }
 
-void CmdGame::infoPlace(const ChessPiece &p) {
+void CmdGame::infoPlace(const ChessPiece& p) {
     system("cls");
     cout << "   A  B  C  D  E  F  G  H  I  J  K  L  M  N  O" << endl;
     for (int8_t i = 0; i < 15; i++) {
@@ -83,7 +88,8 @@ void CmdGame::infoPlace(const ChessPiece &p) {
         for (int8_t j = 0; j < 15; j++) {
             if (i == p.getX() && j == p.getY())
                 cout << "\b(" << toS(chessPad->getByPos(i, j)) << "\b)";
-            else cout << toS(chessPad->getByPos(i, j));
+            else
+                cout << toS(chessPad->getByPos(i, j));
         }
         cout << endl;
     }

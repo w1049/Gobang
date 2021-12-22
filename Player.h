@@ -7,6 +7,7 @@ class Player {
 protected:
     int pid;
     int type;
+
 public:
     Player(int, int);
     Player(const Player&) = delete;
