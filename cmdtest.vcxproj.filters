@@ -39,12 +39,6 @@
     <ClCompile Include="Player.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="NetGame.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="NetPlayer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChessPad.h">
@@ -66,12 +60,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="AIPlayer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="NetGame.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="NetPlayer.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -26,8 +26,6 @@
     <ClCompile Include="CmdPlayer.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="NetGame.cpp" />
-    <ClCompile Include="NetPlayer.cpp" />
     <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -37,8 +35,6 @@
     <ClInclude Include="CmdGame.h" />
     <ClInclude Include="CmdPlayer.h" />
     <ClInclude Include="Game.h" />
-    <ClInclude Include="NetGame.h" />
-    <ClInclude Include="NetPlayer.h" />
     <ClInclude Include="Player.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
