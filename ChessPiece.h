@@ -37,6 +37,7 @@ const int8_t CLICK = 6;
 const int8_t COMMAND = 7;
 const int8_t GAMEINFO = 8;
 const int8_t STOPUNDO = 9;
+const int8_t START = 10; // only for type 7
 }  // namespace GameServer
 
 class ChessPiece {

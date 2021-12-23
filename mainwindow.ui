@@ -109,7 +109,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>127.0.0.1</string>
+     <string>123.207.20.180</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="portLineEdit">
@@ -255,13 +255,13 @@
      <string>主机悔棋次数</string>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>230</x>
       <y>60</y>
       <width>101</width>
-      <height>51</height>
+      <height>57</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">

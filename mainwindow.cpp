@@ -94,7 +94,7 @@ void MainWindow::connectServer() {
     GW->setAttribute(Qt::WA_DeleteOnClose);
     connect(tcpSocket, &QIODevice::readyRead, GW, &GameWindow::readDataClient);
     connect(tcpSocket, &QAbstractSocket::disconnected, GW, &GameWindow::disc);
-    this->close();
+    // this->close();
 }
 
 void MainWindow::on_pushButton_2_clicked() {

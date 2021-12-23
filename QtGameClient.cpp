@@ -13,7 +13,9 @@ extern cpv banned, win5;
 extern ChessPiece rcmd;
 extern int winnerid;
 extern int points;
+extern bool allowUndo;
 }  // namespace render
+
 using namespace render;
 using namespace GameServer;
 
@@ -29,6 +31,8 @@ void QtGameClient::run(int8_t c, QDataStream& in) {
     case TIPS: infoTips(in); break;
     case GAMEOVER: infoGameOver(in); break;
     case PLACE: infoPlace(in); break;
+    case STOPUNDO: allowUndo = 0; break;
+    case START: GW->upd(1); break;
     }
 }
 

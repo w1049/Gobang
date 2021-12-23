@@ -95,6 +95,8 @@ GameWindow::GameWindow(int type, bool mode, QWidget *parent)
     setMouseTracking(true);
     if (type < 6) init();
 }
+
+extern MainWindow *MW;
 void GameWindow::init() {
     if (type < 6) {
         setBtn(0);
@@ -103,24 +105,30 @@ void GameWindow::init() {
         connect(this, &GameWindow::destroyed, this, &GameWindow::stopThread);
     } else {
         ui->pushButton->setDisabled(true);
-        currentPid = 1;
         allowAI = ai2;
         allowUndo = undo2;
         switch (type) {
         case 6:  // 客机白
+            currentPid = 1;
             currentPlayer = nullptr;
             waitPlayer = new QtPlayer(2);
             setBtn(0);
             ui->label_2->setText("等待...");
             break;
         case 7:  // 客机黑
-            currentPlayer = new QtPlayer(1);
-            waitPlayer = nullptr;
-            setBtn(1);
-            ui->label_2->setText("请落子");
+            currentPid = 2;
+            currentPlayer = nullptr;
+            waitPlayer = new QtPlayer(1);
+            setBtn(0);
+            ui->label_2->setText("等待...");
+            //currentPlayer = new QtPlayer(1);
+            //waitPlayer = nullptr;
+            //setBtn(1);
+            // ui->label_2->setText("请落子");
             break;
         }
         this->show();
+        MW->close();
     }
 }
 
@@ -297,6 +305,13 @@ void GameWindow::on_pushButton_clicked() {
         setBtn(0);
         ui->label_2->setText("等待...");
         break;
+    case 3:
+        runningGame = new QtGame(3, mode);
+        currentPlayer = dynamic_cast<QtPlayer *>(runningGame->p[0]);
+        waitPlayer = dynamic_cast<QtPlayer *>(runningGame->p[1]);
+        setBtn(1);
+        ui->label_2->setText("请落子");
+        break;
     case 4:  // 主机黑
         allowAI = ai1;
         allowUndo = undo1;
@@ -316,13 +331,14 @@ void GameWindow::on_pushButton_clicked() {
         remotePlayer = dynamic_cast<QtPlayer *>(runningGame->p[0]);
         setBtn(0);
         ui->label_2->setText("等待...");
-        break;
-    case 3:
-        runningGame = new QtGame(3, mode);
-        currentPlayer = dynamic_cast<QtPlayer *>(runningGame->p[0]);
-        waitPlayer = dynamic_cast<QtPlayer *>(runningGame->p[1]);
-        setBtn(1);
-        ui->label_2->setText("请落子");
+        sendBlock.clear();
+        QDataStream out(&sendBlock, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_0);
+        out << (quint16)0;
+        out << START;
+        out.device()->seek(0);
+        out << (quint16)(sendBlock.size() - sizeof(quint16));
+        sendData();
         break;
     }
     currentPid = 1;
@@ -438,8 +454,6 @@ void GameWindow::readDataClient() {
         QMessageBox::information(this, "服务器信息", str, QMessageBox::Yes,
                                  QMessageBox::Yes);
         init();
-    } else if (c == STOPUNDO) {
-        allowUndo = 0;
     } else {
         clientCtrl.run(c, in);
         if (c == GAMEOVER) {
