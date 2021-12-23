@@ -6,7 +6,7 @@
 #include <QThread>
 #include <string>
 
-#include "NetPlayer.h"
+#include "QtPlayer.h"
 #include "QtGameClient.h"
 #include "QtNetGame.h"
 #include "mainwindow.h"
@@ -33,7 +33,7 @@ int currentPid;
 using namespace render;
 namespace GameServer {
 extern QTcpSocket *clientConnection;
-NetPlayer *remotePlayer;
+QtPlayer *remotePlayer;
 extern QDataStream in;
 QByteArray sendBlock;
 QMutex blockMutex;
@@ -50,9 +50,11 @@ void GameWindow::upd(int pid) {
         if (currentPlayer) {
             ui->pushButton_2->setEnabled(true);
             ui->pushButton_3->setEnabled(true);
+            ui->label_2->setText("请落子");
         } else {
-            ui->pushButton_2->setDisabled(true);
-            ui->pushButton_3->setDisabled(true);
+            ui->pushButton_2->setEnabled(false);
+            ui->pushButton_3->setEnabled(false);
+            ui->label_2->setText("等待...");
         }
     }
     update();
@@ -64,6 +66,7 @@ void GameWindow::upd(int pid) {
 void GameWindow::dealDone() {
     ui->pushButton_2->setDisabled(true);
     ui->pushButton_3->setDisabled(true);
+    ui->label_2->setText("游戏结束！");
     delete runningGame;
     delete pro;
     currentPlayer = nullptr;
@@ -84,6 +87,8 @@ GameWindow::GameWindow(int type, bool mode, QWidget *parent)
     ui->setupUi(this);
     setMouseTracking(true);
     if (type < 6) {
+        ui->pushButton_2->setEnabled(false);
+        ui->pushButton_3->setEnabled(false);
         pro = new MyThread();
         connect(pro, &MyThread::isDone, this, &GameWindow::dealDone);
         connect(this, &GameWindow::destroyed, this, &GameWindow::stopThread);
@@ -92,13 +97,17 @@ GameWindow::GameWindow(int type, bool mode, QWidget *parent)
         switch (type) {
         case 6:
             currentPlayer = nullptr;
-            waitPlayer = new QtPlayer(
-                2);  // dynamic_cast<QtPlayer *>(runningGame->p[1]);
+            waitPlayer = new QtPlayer(2);
+            ui->pushButton_2->setEnabled(false);
+            ui->pushButton_3->setEnabled(false);
+            ui->label_2->setText("等待...");
             break;
         case 7:
-            currentPlayer = new QtPlayer(
-                1);  // dynamic_cast<QtPlayer *>(runningGame->p[0]);
+            currentPlayer = new QtPlayer(1);
             waitPlayer = nullptr;
+            ui->pushButton_2->setEnabled(true);
+            ui->pushButton_3->setEnabled(true);
+            ui->label_2->setText("请落子");
             break;
         }
         currentPid = 1;
@@ -267,28 +276,43 @@ void GameWindow::on_pushButton_clicked() {
         runningGame = new QtGame(1, mode);
         currentPlayer = dynamic_cast<QtPlayer *>(runningGame->p[0]);
         waitPlayer = nullptr;
+        ui->pushButton_2->setEnabled(true);
+        ui->pushButton_3->setEnabled(true);
+        ui->label_2->setText("请落子");
         break;
     case 2:
         runningGame = new QtGame(2, mode);
         currentPlayer = nullptr;
         waitPlayer = dynamic_cast<QtPlayer *>(runningGame->p[1]);
+        ui->pushButton_2->setEnabled(false);
+        ui->pushButton_3->setEnabled(false);
+        ui->label_2->setText("等待...");
         break;
     case 4:
         runningGame = new QtNetGame(1, mode);
         currentPlayer = dynamic_cast<QtPlayer *>(runningGame->p[0]);
         waitPlayer = nullptr;
-        remotePlayer = dynamic_cast<NetPlayer *>(runningGame->p[1]);
+        remotePlayer = dynamic_cast<QtPlayer *>(runningGame->p[1]);
+        ui->pushButton_2->setEnabled(true);
+        ui->pushButton_3->setEnabled(true);
+        ui->label_2->setText("请落子");
         break;
     case 5:
         runningGame = new QtNetGame(2, mode);
         currentPlayer = nullptr;
         waitPlayer = dynamic_cast<QtPlayer *>(runningGame->p[1]);
-        remotePlayer = dynamic_cast<NetPlayer *>(runningGame->p[0]);
+        remotePlayer = dynamic_cast<QtPlayer *>(runningGame->p[0]);
+        ui->pushButton_2->setEnabled(false);
+        ui->pushButton_3->setEnabled(false);
+        ui->label_2->setText("等待...");
         break;
     case 3:
         runningGame = new QtGame(3, mode);
         currentPlayer = dynamic_cast<QtPlayer *>(runningGame->p[0]);
         waitPlayer = dynamic_cast<QtPlayer *>(runningGame->p[1]);
+        ui->pushButton_2->setEnabled(true);
+        ui->pushButton_3->setEnabled(true);
+        ui->label_2->setText("请落子");
         break;
     }
     currentPid = 1;
@@ -388,6 +412,7 @@ void GameWindow::readDataClient() {
             str = "平局！";
         else
             str = "玩家" + QString::number(winnerid) + "赢了! ";
+        ui->label_2->setText("游戏结束！");
         QMessageBox::information(this, "游戏结束", str, QMessageBox::Yes,
                                  QMessageBox::Yes);
     }

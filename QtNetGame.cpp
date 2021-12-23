@@ -3,7 +3,7 @@
 #include <QDebug>
 
 #include "AIPlayer.h"
-#include "NetPlayer.h"
+#include "QtPlayer.h"
 #include "QtPlayer.h"
 #include "gamewindow.h"
 #include "mainwindow.h"
@@ -31,10 +31,10 @@ QtNetGame::QtNetGame(int type, bool mode) {
     switch (type) {
     case 1:
         p[0] = new QtPlayer(1);
-        p[1] = new NetPlayer(2);
+        p[1] = new QtPlayer(2);
         break;
     case 2:
-        p[0] = new NetPlayer(1);
+        p[0] = new QtPlayer(1);
         p[1] = new QtPlayer(2);
         break;
     }

@@ -16,13 +16,20 @@
   <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
-     <x>640</x>
-     <y>30</y>
+     <x>641</x>
+     <y>20</y>
      <width>97</width>
-     <height>162</height>
+     <height>158</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
     <item>
      <widget class="QLabel" name="label">
       <property name="minimumSize">
@@ -41,7 +48,7 @@
       <item>
        <widget class="QPushButton" name="pushButton">
         <property name="text">
-         <string>准备</string>
+         <string>开始游戏</string>
         </property>
        </widget>
       </item>

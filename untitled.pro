@@ -15,8 +15,6 @@ SOURCES += \
     CmdGame.cpp \
     CmdPlayer.cpp \
     Game.cpp \
-    NetGame.cpp \
-    NetPlayer.cpp \
     OldMain.cpp \
     Player.cpp \
     QtGame.cpp \
@@ -35,8 +33,6 @@ HEADERS += \
     CmdGame.h \
     CmdPlayer.h \
     Game.h \
-    NetGame.h \
-    NetPlayer.h \
     Player.h \
     QtGame.h \
     QtGameClient.h \

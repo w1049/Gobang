@@ -6,7 +6,6 @@
 #include "gamewindow.h"
 #include "ui_mainwindow.h"
 #include "mythread.h"
-#include "NetPlayer.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -34,7 +33,7 @@ using namespace render;
 namespace GameServer {
 QTcpSocket *clientConnection;
 QDataStream in;
-extern NetPlayer *remotePlayer;
+extern QtPlayer *remotePlayer;
 QTcpSocket *tcpSocket;
 }
 
