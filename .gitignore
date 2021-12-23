@@ -37,6 +37,7 @@ Thumbs.db
 
 *.dll
 *.exe
+*.vcxproj.user
 
 .vs/
 x64/
