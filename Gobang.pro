@@ -15,14 +15,14 @@ SOURCES += \
     CmdGame.cpp \
     CmdPlayer.cpp \
     Game.cpp \
+    GameWindow.cpp \
+    MainWindow.cpp \
     Player.cpp \
     QtGame.cpp \
     QtGameClient.cpp \
     QtNetGame.cpp \
     QtPlayer.cpp \
-    gamewindow.cpp \
     main.cpp \
-    mainwindow.cpp \
     MyThread.cpp
 
 HEADERS += \
@@ -32,18 +32,18 @@ HEADERS += \
     CmdGame.h \
     CmdPlayer.h \
     Game.h \
+    GameWindow.h \
+    MainWindow.h \
     Player.h \
     QtGame.h \
     QtGameClient.h \
     QtNetGame.h \
     QtPlayer.h \
-    gamewindow.h \
-    mainwindow.h \
     MyThread.h
 
 FORMS += \
-    gamewindow.ui \
-    mainwindow.ui
+    GameWindow.ui \
+    MainWindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -1,7 +1,6 @@
 #ifndef __QT_NET_GAME_H__
 #define __QT_NET_GAME_H__
 
-#include <QDialog>
 #include <QTcpServer>
 #include <QTcpSocket>
 

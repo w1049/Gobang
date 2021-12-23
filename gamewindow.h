@@ -3,7 +3,6 @@
 
 #include <QWidget>
 
-#include "ChessPad.h"
 #include "QtGame.h"
 #include "QtPlayer.h"
 

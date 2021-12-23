@@ -39,7 +39,7 @@ Thumbs.db
 *.exe
 *.vcxproj.user
 
-.vs/
-x64/
-.vscode/
-build/
+.vs/*
+x64/*
+.vscode/*
+build/*

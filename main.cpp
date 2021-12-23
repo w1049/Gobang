@@ -1,7 +1,7 @@
 #include <QApplication>
 
+#include "MainWindow.h"
 #include "QtGame.h"
-#include "mainwindow.h"
 
 MainWindow *MW;
 

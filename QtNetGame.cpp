@@ -1,11 +1,9 @@
 #include "QtNetGame.h"
 
-#include <QDebug>
-
 #include "AIPlayer.h"
+#include "GameWindow.h"
 #include "QtPlayer.h"
-#include "gamewindow.h"
-#include "mainwindow.h"
+
 namespace render {
 extern QMutex drawmutex;
 extern ChessPad currentPad;

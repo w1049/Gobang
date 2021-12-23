@@ -1,8 +1,5 @@
 #include "Game.h"
 
-#include "AIPlayer.h"
-#include "Player.h"
-
 bool Game::step(bool lose) {
     ChessPiece tmp = p[turn - 1]->getNextPiece(*chessPad);
     chessPad->place(tmp);

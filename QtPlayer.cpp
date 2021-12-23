@@ -1,9 +1,6 @@
 #include "QtPlayer.h"
 
-#include <QDebug>
-
-#include "ChessPiece.h"
-#include "gamewindow.h"
+#include "GameWindow.h"
 
 QtPlayer::QtPlayer(int p, int type) : Player(p, type) {}
 

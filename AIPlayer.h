@@ -1,7 +1,6 @@
 #ifndef __AI_PLAYER_H__
 #define __AI_PLAYER_H__
 
-#include "ChessPad.h"
 #include "Player.h"
 
 class AIPlayer : public Player {

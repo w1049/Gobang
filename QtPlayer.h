@@ -1,10 +1,9 @@
 #ifndef __QT_PLAYER_H__
 #define __QT_PLAYER_H__
 
-#include <qmutex.h>
-#include <qwaitcondition.h>
+#include <QMutex>
+#include <QWaitCondition>
 
-#include "ChessPad.h"
 #include "Player.h"
 
 class QtPlayer : public Player {

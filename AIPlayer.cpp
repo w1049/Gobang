@@ -1,7 +1,5 @@
 #include "AIPlayer.h"
 
-#include "ChessPiece.h"
-
 typedef std::pair<int, ChessPiece> prc;
 typedef std::vector<prc> vprc;
 

@@ -1,10 +1,8 @@
 #include "QtGame.h"
 
-#include <QDebug>
-
 #include "AIPlayer.h"
+#include "GameWindow.h"
 #include "QtPlayer.h"
-#include "gamewindow.h"
 
 namespace render {
 extern QMutex drawmutex;

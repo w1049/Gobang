@@ -1,21 +1,19 @@
-#include "gamewindow.h"
+#include "GameWindow.h"
 
-#include <QDebug>
+#include <QBrush>
+#include <QEvent>
 #include <QMessageBox>
+#include <QMouseEvent>
 #include <QMutex>
-#include <QThread>
-#include <string>
+#include <QPainter>
+#include <QPen>
 
+#include "MainWindow.h"
 #include "MyThread.h"
 #include "QtGameClient.h"
 #include "QtNetGame.h"
 #include "QtPlayer.h"
-#include "mainwindow.h"
-#include "qbrush.h"
-#include "qevent.h"
-#include "qpainter.h"
-#include "qpen.h"
-#include "ui_gamewindow.h"
+#include "ui_GameWindow.h"
 namespace render {
 QtGame *runningGame;
 QtPlayer *currentPlayer;
@@ -145,10 +143,10 @@ void GameWindow::paintEvent(QPaintEvent *) {
     for (int i = 0; i < 15; i++) {
         painter.drawLine(40 + i * 40, 60, 40 + i * 40, 620);
         painter.drawLine(40, 60 + i * 40, 600, 60 + i * 40);
-    } // 棋盘线
+    }  // 棋盘线
 
     brush.setColor(Qt::black);
-    painter.setBrush(brush); // 黑点
+    painter.setBrush(brush);  // 黑点
     painter.drawEllipse(155, 175, 10, 10);
     painter.drawEllipse(475, 175, 10, 10);
     painter.drawEllipse(155, 495, 10, 10);
@@ -162,7 +160,7 @@ void GameWindow::paintEvent(QPaintEvent *) {
     drawmutex.lock();
     ui->scoresLabel->setText(QString::number(points));
     auto v = currentPad.getPiecesList();
-    if (v.size()) { // 最后棋子的光环
+    if (v.size()) {  // 最后棋子的光环
         int px = v.back().getX() * 40 + 40;
         int py = v.back().getY() * 40 + 60;
         QRadialGradient radialGradient(px, py, 25, px, py);
@@ -173,13 +171,13 @@ void GameWindow::paintEvent(QPaintEvent *) {
         painter.drawEllipse(px - 26, py - 26, 52, 52);
         for (auto p : v) drawPiece(painter, pen, brush, p);
     }
-    if (banned.size()) { // 禁手
+    if (banned.size()) {  // 禁手
         for (auto p : banned) drawBanned(painter, p);
     }
-    if (win5.size()) { // 警告
+    if (win5.size()) {  // 警告
         for (auto p : win5) drawWarn(painter, p);
     }
-    if (rcmd.getPid()) { // 推荐棋子
+    if (rcmd.getPid()) {  // 推荐棋子
         int px = rcmd.getX() * 40 + 40;
         int py = rcmd.getY() * 40 + 60;
         pen.setColor(Qt::yellow);
@@ -411,7 +409,7 @@ void GameWindow::sendData() {
     clientConnection->flush();
     blockCond.wakeAll();
     blockMutex.unlock();
-    qDebug() << sendBlock.toHex();
+    // qDebug() << sendBlock.toHex();
 }
 
 void GameWindow::readDataClient() {
@@ -420,10 +418,10 @@ void GameWindow::readDataClient() {
         in >> blockSize;
     }
     if (tcpSocket->bytesAvailable() < blockSize) return;
-    qDebug() << tcpSocket->bytesAvailable() << "vs" << blockSize;
+    // qDebug() << tcpSocket->bytesAvailable() << "vs" << blockSize;
     int8_t c;
     in >> c;
-    qDebug() << c;
+    // qDebug() << c;
     if (c == GAMEINFO) {
         qDebug() << "INFO!";
         in >> type >> mode >> infoBan >> infoWin1 >> infoWin2 >> ai1 >> ai2;
@@ -476,11 +474,11 @@ void GameWindow::sendGameInfo() {
     clientConnection->write(sendBlock);
     clientConnection->waitForBytesWritten();
     clientConnection->flush();
-    qDebug() << sendBlock.toHex();
+    // qDebug() << sendBlock.toHex();
 }
 
 void GameWindow::setAIButtonEnabled(bool f) {
-    qDebug() << "set" << f;
+    // qDebug() << "set" << f;
     ui->aiButton->setEnabled(f);
 }
 

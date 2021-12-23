@@ -1,11 +1,9 @@
-#include "mainwindow.h"
+#include "MainWindow.h"
 
-#include <QThread>
-
+#include "GameWindow.h"
 #include "MyThread.h"
 #include "QtNetGame.h"
-#include "gamewindow.h"
-#include "ui_mainwindow.h"
+#include "ui_MainWindow.h"
 
 GameWindow *GW;
 namespace render {
@@ -91,7 +89,8 @@ void MainWindow::connectServer() {
     GW = new GameWindow(6, 0);  // 实际上无所谓的数字
     GW->setAttribute(Qt::WA_DeleteOnClose);
     connect(tcpSocket, &QIODevice::readyRead, GW, &GameWindow::readDataClient);
-    connect(tcpSocket, &QAbstractSocket::disconnected, GW, &GameWindow::exitDisconnected);
+    connect(tcpSocket, &QAbstractSocket::disconnected, GW,
+            &GameWindow::exitDisconnected);
     // this->close();
 }
 
@@ -134,13 +133,13 @@ void MainWindow::displayError(QAbstractSocket::SocketError socketError) {
                                  "服务器未找到。请检查地址与端口。");
         break;
     case QAbstractSocket::ConnectionRefusedError:
-        QMessageBox::information(this, "客户端",
-                                 "连接被拒绝。确保服务器已开启，并检查地址与端口。 ");
+        QMessageBox::information(
+            this, "客户端",
+            "连接被拒绝。确保服务器已开启，并检查地址与端口。 ");
         break;
     default:
-        QMessageBox::information(this, "客户端",
-                                 tr("发生错误: %1.")
-                                     .arg(tcpSocket->errorString()));
+        QMessageBox::information(
+            this, "客户端", tr("发生错误: %1.").arg(tcpSocket->errorString()));
     }
 }
 
