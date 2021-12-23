@@ -38,29 +38,6 @@ QtGame::QtGame(int type, bool mode) {
     connect(this, &QtGame::upd, GW, &GameWindow::upd);
 }
 
-void QtGame::start() {
-    while (1) {
-        int code = 0;
-        if (p[turn - 1]->getType()) {
-            infoTips(turn);
-            code = p[turn - 1]->command(*chessPad);
-            if (code == 1) {  // undo
-                if (!undo()) continue;
-                if (p[turn - 1]->getType() == 0 ||
-                    p[turn - 1]->getType() == 2 || p[2 - turn]->getType() == 2)
-                    if (!undo()) continue;
-                continue;
-            } else if (code == 2) {  // ask
-                AIPlayer ai(turn);
-                ChessPiece p = ai.getNextPiece(*chessPad);
-                infoRecommend(p);
-                continue;
-            }
-        }
-        if (step(code == 3)) break;
-    }
-}
-
 void QtGame::infoRemove() {
     drawmutex.lock();
     currentPad.remove();

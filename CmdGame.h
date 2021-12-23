@@ -6,6 +6,8 @@
 class CmdGame : public Game {
 public:
     CmdGame(int, bool);
+
+private:
     void infoTips(int);
     void infoRecommend(const ChessPiece&);
     void infoGameOver(int pid);

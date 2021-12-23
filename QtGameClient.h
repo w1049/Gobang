@@ -1,11 +1,12 @@
 #ifndef __QT_GAME_CLIENT_H__
 #define __QT_GAME_CLIENT_H__
 
-#include "Game.h"
 #include <QDataStream>
 #include <QtCore>
 
-class QtGameClient : public QObject{
+#include "Game.h"
+
+class QtGameClient : public QObject {
     Q_OBJECT
     friend class GameWindow;
     friend class MainWindow;
@@ -17,9 +18,6 @@ public:
     void infoGameOver(QDataStream&);
     void infoPlace(QDataStream&);
     void infoRemove(QDataStream&);
-
-
-
 };
 
 #endif

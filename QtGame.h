@@ -1,8 +1,9 @@
 #ifndef __QT_GAME_H__
 #define __QT_GAME_H__
 
-#include "Game.h"
 #include <QtCore>
+
+#include "Game.h"
 
 class QtGame : public QObject, public Game {
     Q_OBJECT
@@ -12,7 +13,8 @@ class QtGame : public QObject, public Game {
 public:
     QtGame() = default;
     QtGame(int, bool);
-    void start();
+
+private:
     void infoTips(int);
     void infoRecommend(const ChessPiece&);
     void infoGameOver(int pid);

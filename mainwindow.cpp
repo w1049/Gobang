@@ -4,8 +4,8 @@
 
 #include "QtNetGame.h"
 #include "gamewindow.h"
-#include "ui_mainwindow.h"
 #include "mythread.h"
+#include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -35,7 +35,9 @@ QTcpSocket *clientConnection;
 QDataStream in;
 extern QtPlayer *remotePlayer;
 QTcpSocket *tcpSocket;
-}
+extern bool infoBan, infoWin1, infoWin2, ai1, ai2;
+extern int undo1, undo2;
+}  // namespace GameServer
 
 using namespace GameServer;
 
@@ -65,21 +67,24 @@ void MainWindow::initServer() {
     if (!tcpServer->listen(QHostAddress::Any, 9000)) {
         QMessageBox::critical(this, tr("Game Server"),
                               tr("Unable to start the server: %1.")
-                              .arg(tcpServer->errorString()));
+                                  .arg(tcpServer->errorString()));
         return;
     }
 }
 
 void MainWindow::connectClient() {
     clientConnection = tcpServer->nextPendingConnection();
-    connect(clientConnection, &QAbstractSocket::disconnected,
-            clientConnection, &QObject::deleteLater);
+    connect(clientConnection, &QAbstractSocket::disconnected, clientConnection,
+            &QObject::deleteLater);
     int type = 4, mode = 0;
+    infoBan = 1, infoWin1 = 1, infoWin2 = 1, ai1 = 1, ai2 = 0;
+    undo1 = 2, undo2 = 1;
     GW = new GameWindow(type, mode);
     GW->setAttribute(Qt::WA_DeleteOnClose);
     connect(clientConnection, &QIODevice::readyRead, GW, &GameWindow::readData);
     in.setDevice(clientConnection);
     in.setVersion(QDataStream::Qt_4_0);
+    GW->sendGameInfo();
     GW->show();
     this->close();
 }
@@ -88,16 +93,15 @@ void MainWindow::connectServer() {
     GW = new GameWindow(6, 0);
     GW->setAttribute(Qt::WA_DeleteOnClose);
     connect(tcpSocket, &QIODevice::readyRead, GW, &GameWindow::readDataClient);
-    GW->show();
     this->close();
 }
 
 void MainWindow::on_pushButton_2_clicked() {
     initServer();
-    connect(tcpServer, &QTcpServer::newConnection, this, &MainWindow::connectClient);
+    connect(tcpServer, &QTcpServer::newConnection, this,
+            &MainWindow::connectClient);
     ui->pushButton_2->setDisabled(true);
 }
-
 
 void MainWindow::on_pushButton_3_clicked() {
     ui->pushButton_3->setDisabled(true);
@@ -107,8 +111,7 @@ void MainWindow::on_pushButton_3_clicked() {
 
 void MainWindow::displayError(QAbstractSocket::SocketError socketError) {
     switch (socketError) {
-    case QAbstractSocket::RemoteHostClosedError:
-        break;
+    case QAbstractSocket::RemoteHostClosedError: break;
     case QAbstractSocket::HostNotFoundError:
         QMessageBox::information(this, tr("Fortune Client"),
                                  tr("The host was not found. Please check the "
@@ -124,17 +127,17 @@ void MainWindow::displayError(QAbstractSocket::SocketError socketError) {
     default:
         QMessageBox::information(this, tr("Fortune Client"),
                                  tr("The following error occurred: %1.")
-                                 .arg(tcpSocket->errorString()));
+                                     .arg(tcpSocket->errorString()));
     }
     ui->pushButton_3->setEnabled(true);
 }
-
 
 void MainWindow::on_pushButton_4_clicked() {
     tcpSocket = new QTcpSocket(this);
     in.setDevice(tcpSocket);
     in.setVersion(QDataStream::Qt_4_0);
-    connect(tcpSocket, &QTcpSocket::connected, this, &MainWindow::connectServer);
-    connect(tcpSocket, &QAbstractSocket::errorOccurred, this, &MainWindow::displayError);
+    connect(tcpSocket, &QTcpSocket::connected, this,
+            &MainWindow::connectServer);
+    connect(tcpSocket, &QAbstractSocket::errorOccurred, this,
+            &MainWindow::displayError);
 }
-

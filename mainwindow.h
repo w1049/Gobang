@@ -3,8 +3,8 @@
 
 #include <QMainWindow>
 #include <QMessageBox>
-#include <QtNetwork>
 #include <QtCore>
+#include <QtNetwork>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

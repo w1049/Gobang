@@ -17,7 +17,7 @@ int main() {
         char y = cin.get();
         cin.get();
         CmdGame g(x - '0', y - '0');
-        g.start();
+        g.start(1);
         cout << "按回车键退出游戏，或输入1再来一局" << endl;
         if (cin.get() == '1')
             continue;

@@ -4,7 +4,7 @@
 
 #include "ChessPiece.h"
 
-QtPlayer::QtPlayer(int p) : Player(p, 1) {}
+QtPlayer::QtPlayer(int p, int type) : Player(p, type) {}
 
 ChessPiece QtPlayer::getNextPiece(const ChessPad&) {
     return ChessPiece(pid, Tx, Ty);

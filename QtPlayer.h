@@ -9,7 +9,7 @@
 
 class QtPlayer : public Player {
 public:
-    QtPlayer(int);
+    QtPlayer(int, int = 1);
     ChessPiece getNextPiece(const ChessPad&);
     void infoFailed(const ChessPiece&, int);
     int command(const ChessPad&);

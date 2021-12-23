@@ -7,6 +7,7 @@ class Player {
 protected:
     int pid;
     int type;
+    // 0: 电脑 1: 玩家 2: 远程玩家
 
 public:
     Player(int, int);

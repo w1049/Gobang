@@ -35,7 +35,9 @@ const int8_t GAMEOVER = 4;
 const int8_t PLACE = 5;
 const int8_t CLICK = 6;
 const int8_t COMMAND = 7;
-}
+const int8_t GAMEINFO = 8;
+const int8_t STOPUNDO = 9;
+}  // namespace GameServer
 
 class ChessPiece {
 private:

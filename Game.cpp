@@ -34,17 +34,21 @@ bool Game::undo() {
     infoRemove();
     return 1;
 }
+bool Game::canUndo(int) {
+    return 1;
+}
 
 void Game::infoRemove() { infoPlace(ChessPiece(0, -1, -1)); }
 
-void Game::start() {
-    infoPlace(ChessPiece(0, -1, -1));
+void Game::start(bool f) {
+    if (f) infoPlace(ChessPiece(0, -1, -1));
     while (1) {
         int code = 0;
         if (p[turn - 1]->getType()) {
             infoTips(turn);
             code = p[turn - 1]->command(*chessPad);
             if (code == 1) {  // undo
+                if (!canUndo(turn)) continue;
                 if (!undo()) continue;
                 if (p[turn - 1]->getType() == 0 ||
                     p[turn - 1]->getType() == 2 || p[2 - turn]->getType() == 2)

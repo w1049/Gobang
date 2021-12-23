@@ -1,10 +1,11 @@
 #ifndef __QT_NET_GAME_H__
 #define __QT_NET_GAME_H__
 
-#include "QtGame.h"
 #include <QDialog>
 #include <QTcpServer>
 #include <QTcpSocket>
+
+#include "QtGame.h"
 
 class QtNetGame : public QtGame {
     Q_OBJECT
@@ -13,7 +14,9 @@ class QtNetGame : public QtGame {
 
 public:
     QtNetGame(int, bool);
-    void start();
+
+private:
+    bool canUndo(int);
     void infoTips(int);
     void infoRecommend(const ChessPiece&);
     void infoGameOver(int pid);
@@ -22,7 +25,6 @@ public:
 
 signals:
     void sendData();
-
 };
 
 #endif

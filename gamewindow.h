@@ -19,6 +19,7 @@ public:
     ~GameWindow();
     void upd(int = 0);
     void dealDone();
+    void sendGameInfo();
 
 protected:
     void paintEvent(QPaintEvent *);
@@ -30,12 +31,13 @@ private slots:
     void on_pushButton_2_clicked();
     void on_pushButton_3_clicked();
 
-public slots: // private?
+public slots:  // private?
     void readData();
     void sendData();
     void readDataClient();
 
 private:
+    void init();
     Ui::GameWindow *ui;
     int moveX = -1;
     int moveY = -1;
@@ -44,6 +46,7 @@ private:
     void drawBanned(QPainter &, const ChessPiece &);
     void drawWarn(QPainter &, const ChessPiece &);
     void stopThread();
+    void setBtn(bool);
 };
 
 #endif  // GAMEWINDOW_H

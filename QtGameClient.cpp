@@ -23,12 +23,12 @@ QDataStream& operator<<(QDataStream& o, const ChessPiece& p);
 QDataStream& operator>>(QDataStream& o, ChessPiece& p);
 
 void QtGameClient::run(int8_t c, QDataStream& in) {
-    switch(c) {
-        case REMOVE: infoRemove(in); break;
-        case RECOMMEND: infoRecommend(in); break;
-        case TIPS: infoTips(in); break;
-        case GAMEOVER: infoGameOver(in); break;
-        case PLACE: infoPlace(in); break;
+    switch (c) {
+    case REMOVE: infoRemove(in); break;
+    case RECOMMEND: infoRecommend(in); break;
+    case TIPS: infoTips(in); break;
+    case GAMEOVER: infoGameOver(in); break;
+    case PLACE: infoPlace(in); break;
     }
 }
 
@@ -62,11 +62,9 @@ void QtGameClient::infoTips(QDataStream& in) {
     win5.clear();
     // read vectors and push
     in >> s1;
-    for (uint8_t i = 0; i < s1; i++)
-        in >> p, banned.push_back(p);
+    for (uint8_t i = 0; i < s1; i++) in >> p, banned.push_back(p);
     in >> s2;
-    for (uint8_t i = 0; i < s2; i++)
-        in >> p, win5.push_back(p);
+    for (uint8_t i = 0; i < s2; i++) in >> p, win5.push_back(p);
     GW->upd();
     // drawmutex.unlock();
 }

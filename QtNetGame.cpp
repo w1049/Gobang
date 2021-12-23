@@ -4,7 +4,6 @@
 
 #include "AIPlayer.h"
 #include "QtPlayer.h"
-#include "QtPlayer.h"
 #include "gamewindow.h"
 #include "mainwindow.h"
 
@@ -24,6 +23,8 @@ namespace GameServer {
 extern QByteArray sendBlock;
 extern QMutex blockMutex;
 extern QWaitCondition blockCond;
+extern bool infoBan, infoWin1, infoWin2, ai1, ai2;
+extern int undo1, undo2;
 }  // namespace GameServer
 using namespace GameServer;
 
@@ -31,39 +32,20 @@ QtNetGame::QtNetGame(int type, bool mode) {
     switch (type) {
     case 1:
         p[0] = new QtPlayer(1);
-        p[1] = new QtPlayer(2);
+        dynamic_cast<QtPlayer*>(p[0])->undoLimit = undo1;
+        p[1] = new QtPlayer(2, 2);
+        dynamic_cast<QtPlayer*>(p[1])->undoLimit = undo2;
         break;
     case 2:
-        p[0] = new QtPlayer(1);
+        p[0] = new QtPlayer(1, 2);
+        dynamic_cast<QtPlayer*>(p[0])->undoLimit = undo2;
         p[1] = new QtPlayer(2);
+        dynamic_cast<QtPlayer*>(p[1])->undoLimit = undo1;
         break;
     }
     chessPad = new ChessPad(mode);
     connect(this, &QtNetGame::sendData, GW, &GameWindow::sendData);
     connect(this, &QtNetGame::upd, GW, &GameWindow::upd);
-}
-
-void QtNetGame::start() {
-    while (1) {
-        int code = 0;
-        if (p[turn - 1]->getType()) {
-            infoTips(turn);
-            code = p[turn - 1]->command(*chessPad);
-            if (code == 1) {  // undo
-                if (!undo()) continue;
-                if (p[turn - 1]->getType() == 0 ||
-                    p[turn - 1]->getType() == 2 || p[2 - turn]->getType() == 2)
-                    if (!undo()) continue;
-                continue;
-            } else if (code == 2) {  // ask
-                AIPlayer ai(turn);
-                ChessPiece p = ai.getNextPiece(*chessPad);
-                infoRecommend(p);
-                continue;
-            }
-        }
-        if (step(code == 3)) break;
-    }
 }
 
 QDataStream& operator<<(QDataStream& o, const ChessPiece& p) {
@@ -76,6 +58,31 @@ QDataStream& operator>>(QDataStream& i, ChessPiece& p) {
     i >> a >> b >> c;
     p.set(a, b, c);
     return i;
+}
+
+bool QtNetGame::canUndo(int pid) {
+    QtPlayer *player = dynamic_cast<QtPlayer*>(p[pid - 1]);
+    if (player->undoLimit) {
+        --player->undoLimit;
+        return 1;
+    } else {
+        if (player->getPid() == 2) {
+            blockMutex.lock();
+            sendBlock.clear();
+            QDataStream out(&sendBlock, QIODevice::WriteOnly);
+            out.setVersion(QDataStream::Qt_5_10);
+            out << (quint16)0;
+            out << STOPUNDO;
+            out.device()->seek(0);
+            out << (quint16)(sendBlock.size() - sizeof(quint16));
+            emit sendData();
+            blockCond.wait(&blockMutex);
+            blockMutex.unlock();
+        }
+
+        return 0;
+    }
+
 }
 
 void QtNetGame::infoRemove() {
@@ -131,6 +138,7 @@ void QtNetGame::infoTips(int pid) {
     cpv banned, win5;
     points = -AI::g(3 - turn, *chessPad);
     ChessPiece p;
+    if (infoBan)
     for (int8_t x = 0; x < 15; x++)
         for (int8_t y = 0; y < 15; y++) {
             int code = chessPad->checkState(p.set(pid, x, y));
@@ -145,11 +153,12 @@ void QtNetGame::infoTips(int pid) {
     if (this->p[pid - 1]->getType() == 1) {
         drawmutex.lock();
         ::banned = banned;
-        ::win5 = win5;
+        if (infoWin1) ::win5 = win5;
         ::points = points;
         emit upd(0);
         drawmutex.unlock();
     } else {
+        if (!infoWin2) win5.clear();
         // if pid == remotepid then
         // send tips
         // send points
