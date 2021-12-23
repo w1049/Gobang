@@ -2,6 +2,8 @@
 
 #include "GameWindow.h"
 
+extern GameWindow* GW;
+
 QtPlayer::QtPlayer(int p, int type) : Player(p, type) {}
 
 ChessPiece QtPlayer::getNextPiece(const ChessPad&) {
@@ -13,7 +15,6 @@ void QtPlayer::infoFailed(const ChessPiece&, int) {
     // 'A') << (int)p.getX() + 1 << "下棋." << '\n';
 }
 
-extern GameWindow* GW;
 int QtPlayer::command(const ChessPad& pad) {
     ChessPiece p;
     int reason;

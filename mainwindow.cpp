@@ -5,7 +5,6 @@
 #include "QtNetGame.h"
 #include "ui_MainWindow.h"
 
-GameWindow *GW;
 namespace render {
 extern QtGame *runningGame;
 extern QtPlayer *currentPlayer;
@@ -19,8 +18,10 @@ extern ChessPiece rcmd;
 extern int winnerid;
 extern MyThread *gameThread;
 extern int currentPid;
+extern int aiDepth;
 }  // namespace render
 using namespace render;
+
 namespace GameServer {
 QTcpSocket *clientConnection;
 QDataStream in;
@@ -31,6 +32,8 @@ extern int undo1, undo2;
 }  // namespace GameServer
 
 using namespace GameServer;
+
+GameWindow *GW;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -54,6 +57,7 @@ void MainWindow::on_localButton_clicked() {
     if (ui->Type_1->isChecked()) type = 1;
     if (ui->Type_2->isChecked()) type = 2;
     if (ui->Type_3->isChecked()) type = 3;
+    aiDepth = ui->depthCombo->currentText().toInt() * 2 - 1;
     GW = new GameWindow(type, mode);
     GW->setAttribute(Qt::WA_DeleteOnClose);
     GW->show();

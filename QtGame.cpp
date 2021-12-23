@@ -11,8 +11,11 @@ extern cpv banned, win5;
 extern ChessPiece rcmd;
 extern int winnerid;
 extern int points;
+int aiDepth;
+int myAiDepth;
 }  // namespace render
 using namespace render;
+
 namespace GameServer {
 extern bool infoBan;
 }
@@ -24,10 +27,10 @@ QtGame::QtGame(int type, bool mode) {
     switch (type) {
     case 1:
         p[0] = new QtPlayer(1);
-        p[1] = new AIPlayer(2);
+        p[1] = new AIPlayer(2, aiDepth);
         break;
     case 2:
-        p[0] = new AIPlayer(1);
+        p[0] = new AIPlayer(1, aiDepth);
         p[1] = new QtPlayer(2);
         break;
     default:

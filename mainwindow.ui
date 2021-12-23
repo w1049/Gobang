@@ -17,14 +17,14 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>11</x>
+      <x>20</x>
       <y>10</y>
-      <width>104</width>
+      <width>51</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>人机 / 本地双人</string>
+     <string>AI强度</string>
     </property>
    </widget>
    <widget class="QPushButton" name="localButton">
@@ -76,7 +76,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>123.207.20.180</string>
+     <string>127.0.0.1</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="portLineEdit">
@@ -176,7 +176,7 @@
       <x>388</x>
       <y>85</y>
       <width>41</width>
-      <height>16</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
@@ -189,7 +189,7 @@
       <x>388</x>
       <y>115</y>
       <width>41</width>
-      <height>16</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
@@ -286,6 +286,44 @@
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QComboBox" name="depthCombo">
+    <property name="geometry">
+     <rect>
+      <x>78</x>
+      <y>10</y>
+      <width>41</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="editable">
+     <bool>false</bool>
+    </property>
+    <item>
+     <property name="text">
+      <string>4</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>1</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>2</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>3</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>5</string>
+     </property>
+    </item>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

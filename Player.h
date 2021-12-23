@@ -15,6 +15,7 @@ public:
     Player& operator=(const Player&) = delete;
     int getPid();
     int getType();
+    int depth = 0;  // dfs深度
     // 传入当前情况, 获取下一步的位置.
     virtual ChessPiece getNextPiece(const ChessPad&) = 0;
     // 玩家可能输入指令

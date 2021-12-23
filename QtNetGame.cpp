@@ -14,8 +14,6 @@ extern int points;
 }  // namespace render
 using namespace render;
 
-class GameWindow;
-extern GameWindow* GW;
 namespace GameServer {
 extern QByteArray sendBlock;
 extern QMutex blockMutex;
@@ -24,6 +22,9 @@ extern bool infoBan, infoWin1, infoWin2, ai1, ai2;
 extern int undo1, undo2;
 }  // namespace GameServer
 using namespace GameServer;
+
+class GameWindow;
+extern GameWindow* GW;
 
 QtNetGame::QtNetGame(int type, bool mode) {
     switch (type) {
@@ -109,7 +110,6 @@ void QtNetGame::infoRemove() {
 void QtNetGame::infoRecommend(const ChessPiece& p) {
     // send recommend
     // send p
-
     if (this->p[p.getPid() - 1]->getType() == 1) {
         drawmutex.lock();
         rcmd = p;

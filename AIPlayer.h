@@ -5,7 +5,7 @@
 
 class AIPlayer : public Player {
 public:
-    AIPlayer(int);
+    AIPlayer(int, int = 7);
     ChessPiece getNextPiece(const ChessPad&);
 
 private:
@@ -13,8 +13,6 @@ private:
     int8_t r;
     // 搜索
     int dfs(ChessPiece&, int, ChessPad&, int, int = -INF, int = INF);
-    // 搜索深度
-    int depth;
 };
 namespace AI {
 // 启发式评估函数，评估某一空位的优先程度

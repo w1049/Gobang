@@ -13,13 +13,13 @@
   <property name="windowTitle">
    <string>五子棋</string>
   </property>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
-     <x>640</x>
-     <y>20</y>
-     <width>100</width>
-     <height>160</height>
+     <x>641</x>
+     <y>21</y>
+     <width>97</width>
+     <height>192</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -64,6 +64,49 @@
         <property name="text">
          <string>AI辅助</string>
         </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>AI强度</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="depthCombo">
+        <property name="editable">
+         <bool>false</bool>
+        </property>
+        <item>
+         <property name="text">
+          <string>4</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>1</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>2</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>3</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>5</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>

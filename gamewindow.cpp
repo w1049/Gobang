@@ -14,6 +14,7 @@
 #include "QtNetGame.h"
 #include "QtPlayer.h"
 #include "ui_GameWindow.h"
+
 namespace render {
 QtGame *runningGame;
 QtPlayer *currentPlayer;
@@ -30,6 +31,7 @@ int currentPid;
 bool allowUndo = 1, allowAI = 1;
 }  // namespace render
 using namespace render;
+
 namespace GameServer {
 extern QTcpSocket *clientConnection;
 QtPlayer *remotePlayer;
@@ -43,6 +45,9 @@ bool infoBan, infoWin1, infoWin2, ai1, ai2;
 int undo1, undo2;
 }  // namespace GameServer
 using namespace GameServer;
+
+extern MainWindow *MW;
+
 void GameWindow::upd(int pid) {
     if (pid && pid != currentPid) {
         // 回合结束
@@ -67,10 +72,6 @@ void GameWindow::setButtonEnabled(bool f) {
 void GameWindow::dealDone() {
     setButtonEnabled(0);
     ui->statusLabel->setText("游戏结束！");
-    delete runningGame;
-    delete gameThread;
-    currentPlayer = nullptr;
-    waitPlayer = nullptr;
     QString str;
     if (winnerid == 3)
         str = "平局！";
@@ -80,6 +81,10 @@ void GameWindow::dealDone() {
         str = "玩家" + QString::number(winnerid) + "赢了! ";
     QMessageBox::information(this, "游戏结束", str, QMessageBox::Yes,
                              QMessageBox::Yes);
+    delete runningGame;
+    delete gameThread;
+    currentPlayer = nullptr;
+    waitPlayer = nullptr;
 }
 
 GameWindow::GameWindow(int type, bool mode, QWidget *parent)
@@ -89,7 +94,6 @@ GameWindow::GameWindow(int type, bool mode, QWidget *parent)
     if (type < 6) init();
 }
 
-extern MainWindow *MW;
 void GameWindow::init() {
     if (type < 6) {
         setButtonEnabled(0);
@@ -362,6 +366,7 @@ void GameWindow::on_aiButton_clicked() {
     if (runningGame) {
         currentPlayer->mutex.lock();
         currentPlayer->cmd = 2;
+        currentPlayer->depth = ui->depthCombo->currentText().toInt() * 2 - 1;
         currentPlayer->hasCmd.wakeAll();
         currentPlayer->mutex.unlock();
     } else {
@@ -369,7 +374,7 @@ void GameWindow::on_aiButton_clicked() {
         QDataStream out(&sendBlock, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_0);
         out << (quint16)0;
-        out << COMMAND << 2;
+        out << COMMAND << 2 << ui->depthCombo->currentText().toInt() * 2 - 1;
         out.device()->seek(0);
         out << (quint16)(sendBlock.size() - sizeof(quint16));
         tcpSocket->write(sendBlock);
@@ -391,6 +396,7 @@ void GameWindow::readData() {
     remotePlayer->mutex.lock();
     if (c == COMMAND) {
         in >> remotePlayer->cmd;
+        if (remotePlayer->cmd == 2) in >> remotePlayer->depth;
         remotePlayer->hasCmd.wakeAll();
     } else if (c == CLICK) {
         remotePlayer->cmd = 0;
@@ -445,8 +451,6 @@ void GameWindow::readDataClient() {
         clientCtrl.run(c, in);
         if (c == GAMEOVER) {
             setButtonEnabled(0);
-            if (currentPlayer) delete currentPlayer;
-            if (waitPlayer) delete waitPlayer;
             QString str;
             if (winnerid == 3)
                 str = "平局！";
@@ -455,6 +459,8 @@ void GameWindow::readDataClient() {
             ui->statusLabel->setText("游戏结束！");
             QMessageBox::information(this, "游戏结束", str, QMessageBox::Yes,
                                      QMessageBox::Yes);
+            if (currentPlayer) delete currentPlayer;
+            if (waitPlayer) delete waitPlayer;
         }
     }
     blockSize = 0;

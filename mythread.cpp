@@ -1,6 +1,7 @@
 #include "MyThread.h"
 
 #include "QtGame.h"
+
 namespace render {
 extern QtGame* runningGame;
 }
