@@ -54,7 +54,7 @@ void QtGame::infoRemove() {
 void QtGame::infoRecommend(const ChessPiece& p) {
     drawmutex.lock();
     rcmd = p;
-    GW->enableAI(1);
+    GW->setAIButtonEnabled(1);
     emit upd(0);
     drawmutex.unlock();
 }

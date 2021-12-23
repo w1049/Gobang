@@ -28,7 +28,7 @@ int QtPlayer::command(const ChessPad& pad) {
             return 1;
         } else if (cmd == 2) {
             mutex.unlock();
-            if (pid == 1) GW->enableAI(0);
+            if (pid == 1) GW->setAIButtonEnabled(0);
             return 2;
         }
         reason = pad.checkState(p.set(pid, Tx, Ty));

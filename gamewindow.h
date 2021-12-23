@@ -20,7 +20,7 @@ public:
     void upd(int = 0);
     void dealDone();
     void sendGameInfo();
-    void enableAI(bool);
+    void setAIButtonEnabled(bool);
 
 protected:
     void paintEvent(QPaintEvent *);
@@ -28,15 +28,15 @@ protected:
     void mouseReleaseEvent(QMouseEvent *);
 
 private slots:
-    void on_pushButton_clicked();
-    void on_pushButton_2_clicked();
-    void on_pushButton_3_clicked();
+    void on_startButton_clicked();
+    void on_undoButton_clicked();
+    void on_aiButton_clicked();
 
 public slots:
     void readData();
     void sendData();
     void readDataClient();
-    void disc();
+    void exitDisconnected();
 
 private:
     void init();
@@ -48,7 +48,7 @@ private:
     void drawBanned(QPainter &, const ChessPiece &);
     void drawWarn(QPainter &, const ChessPiece &);
     void stopThread();
-    void setBtn(bool);
+    void setButtonEnabled(bool);
 };
 
 #endif  // GAMEWINDOW_H

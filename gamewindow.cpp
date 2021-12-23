@@ -27,7 +27,7 @@ cpv banned;
 cpv win5;
 ChessPiece rcmd;
 int winnerid;
-MyThread *pro;
+MyThread *gameThread;
 int currentPid;
 bool allowUndo = 1, allowAI = 1;
 }  // namespace render
@@ -51,31 +51,26 @@ void GameWindow::upd(int pid) {
         currentPid = pid;
         std::swap(currentPlayer, waitPlayer);
         if (currentPlayer) {
-            setBtn(1);
-            ui->label_2->setText("请落子");
+            setButtonEnabled(1);
+            ui->statusLabel->setText("请落子");
         } else {
-            setBtn(0);
-            ui->label_2->setText("等待...");
+            setButtonEnabled(0);
+            ui->statusLabel->setText("等待...");
         }
     }
     update();
 }
 
-// 模式选择
-// 谁先 禁手开关 禁手显示 连5提示（1/2） 悔棋次数 允许AI
-// type mode info infoWin1 infoWin2 undo1 undo2 ai1 ai2
-// 垃圾处理
-
-void GameWindow::setBtn(bool f) {
-    ui->pushButton_2->setEnabled(f && allowUndo);
-    ui->pushButton_3->setEnabled(f && allowAI);
+void GameWindow::setButtonEnabled(bool f) {
+    ui->undoButton->setEnabled(f && allowUndo);
+    ui->aiButton->setEnabled(f && allowAI);
 }
 
 void GameWindow::dealDone() {
-    setBtn(0);
-    ui->label_2->setText("游戏结束！");
+    setButtonEnabled(0);
+    ui->statusLabel->setText("游戏结束！");
     delete runningGame;
-    delete pro;
+    delete gameThread;
     currentPlayer = nullptr;
     waitPlayer = nullptr;
     QString str;
@@ -99,12 +94,12 @@ GameWindow::GameWindow(int type, bool mode, QWidget *parent)
 extern MainWindow *MW;
 void GameWindow::init() {
     if (type < 6) {
-        setBtn(0);
-        pro = new MyThread();
-        connect(pro, &MyThread::isDone, this, &GameWindow::dealDone);
+        setButtonEnabled(0);
+        gameThread = new MyThread();
+        connect(gameThread, &MyThread::isDone, this, &GameWindow::dealDone);
         connect(this, &GameWindow::destroyed, this, &GameWindow::stopThread);
     } else {
-        ui->pushButton->setDisabled(true);
+        ui->startButton->setDisabled(true);
         allowAI = ai2;
         allowUndo = undo2;
         switch (type) {
@@ -112,19 +107,15 @@ void GameWindow::init() {
             currentPid = 1;
             currentPlayer = nullptr;
             waitPlayer = new QtPlayer(2);
-            setBtn(0);
-            ui->label_2->setText("等待...");
+            setButtonEnabled(0);
+            ui->statusLabel->setText("等待...");
             break;
         case 7:  // 客机黑
             currentPid = 2;
             currentPlayer = nullptr;
             waitPlayer = new QtPlayer(1);
-            setBtn(0);
-            ui->label_2->setText("等待...");
-            //currentPlayer = new QtPlayer(1);
-            //waitPlayer = nullptr;
-            //setBtn(1);
-            // ui->label_2->setText("请落子");
+            setButtonEnabled(0);
+            ui->statusLabel->setText("等待...");
             break;
         }
         this->show();
@@ -154,10 +145,10 @@ void GameWindow::paintEvent(QPaintEvent *) {
     for (int i = 0; i < 15; i++) {
         painter.drawLine(40 + i * 40, 60, 40 + i * 40, 620);
         painter.drawLine(40, 60 + i * 40, 600, 60 + i * 40);
-    }
+    } // 棋盘线
 
     brush.setColor(Qt::black);
-    painter.setBrush(brush);
+    painter.setBrush(brush); // 黑点
     painter.drawEllipse(155, 175, 10, 10);
     painter.drawEllipse(475, 175, 10, 10);
     painter.drawEllipse(155, 495, 10, 10);
@@ -169,9 +160,9 @@ void GameWindow::paintEvent(QPaintEvent *) {
                   ChessPiece(currentPlayer->getPid(), moveX, moveY), 127);
 
     drawmutex.lock();
-    ui->label->setText(QString::number(points));
+    ui->scoresLabel->setText(QString::number(points));
     auto v = currentPad.getPiecesList();
-    if (v.size()) {
+    if (v.size()) { // 最后棋子的光环
         int px = v.back().getX() * 40 + 40;
         int py = v.back().getY() * 40 + 60;
         QRadialGradient radialGradient(px, py, 25, px, py);
@@ -182,13 +173,13 @@ void GameWindow::paintEvent(QPaintEvent *) {
         painter.drawEllipse(px - 26, py - 26, 52, 52);
         for (auto p : v) drawPiece(painter, pen, brush, p);
     }
-    if (banned.size()) {
+    if (banned.size()) { // 禁手
         for (auto p : banned) drawBanned(painter, p);
     }
-    if (win5.size()) {
+    if (win5.size()) { // 警告
         for (auto p : win5) drawWarn(painter, p);
     }
-    if (rcmd.getPid()) {
+    if (rcmd.getPid()) { // 推荐棋子
         int px = rcmd.getX() * 40 + 40;
         int py = rcmd.getY() * 40 + 60;
         pen.setColor(Qt::yellow);
@@ -245,9 +236,7 @@ void GameWindow::mouseMoveEvent(QMouseEvent *event) {
     moveY = (event->position().y()) / 40;
     moveX = (event->position().x() + 20) / 40;
     --moveY, --moveX;
-    if (moveX >= 0 && moveX < 15 && moveY >= 0 && moveY < 15)
-        ;
-    else
+    if (!(moveX >= 0 && moveX < 15 && moveY >= 0 && moveY < 15))
         moveX = moveY = -1;
     update();
 }
@@ -278,39 +267,39 @@ void GameWindow::mouseReleaseEvent(QMouseEvent *) {
 }
 
 void GameWindow::stopThread() {
-    pro->quit();
-    pro->wait();
+    gameThread->quit();
+    gameThread->wait();
     delete runningGame;
 }
 
 GameWindow::~GameWindow() {
     delete ui;
-    // disconnect(pro, &MyThread::isDone, this, &GameWindow::dealDone);
+    // disconnect(gameThread, &MyThread::isDone, this, &GameWindow::dealDone);
     disconnect(this, &GameWindow::destroyed, this, &GameWindow::stopThread);
 }
 
-void GameWindow::on_pushButton_clicked() {
+void GameWindow::on_startButton_clicked() {
     switch (type) {
     case 1:
         runningGame = new QtGame(1, mode);
         currentPlayer = dynamic_cast<QtPlayer *>(runningGame->p[0]);
         waitPlayer = nullptr;
-        setBtn(1);
-        ui->label_2->setText("请落子");
+        setButtonEnabled(1);
+        ui->statusLabel->setText("请落子");
         break;
     case 2:
         runningGame = new QtGame(2, mode);
         currentPlayer = nullptr;
         waitPlayer = dynamic_cast<QtPlayer *>(runningGame->p[1]);
-        setBtn(0);
-        ui->label_2->setText("等待...");
+        setButtonEnabled(0);
+        ui->statusLabel->setText("等待...");
         break;
     case 3:
         runningGame = new QtGame(3, mode);
         currentPlayer = dynamic_cast<QtPlayer *>(runningGame->p[0]);
         waitPlayer = dynamic_cast<QtPlayer *>(runningGame->p[1]);
-        setBtn(1);
-        ui->label_2->setText("请落子");
+        setButtonEnabled(1);
+        ui->statusLabel->setText("请落子");
         break;
     case 4:  // 主机黑
         allowAI = ai1;
@@ -319,8 +308,8 @@ void GameWindow::on_pushButton_clicked() {
         currentPlayer = dynamic_cast<QtPlayer *>(runningGame->p[0]);
         waitPlayer = nullptr;
         remotePlayer = dynamic_cast<QtPlayer *>(runningGame->p[1]);
-        setBtn(1);
-        ui->label_2->setText("请落子");
+        setButtonEnabled(1);
+        ui->statusLabel->setText("请落子");
         break;
     case 5:  // 主机白
         allowAI = ai1;
@@ -329,8 +318,8 @@ void GameWindow::on_pushButton_clicked() {
         currentPlayer = nullptr;
         waitPlayer = dynamic_cast<QtPlayer *>(runningGame->p[1]);
         remotePlayer = dynamic_cast<QtPlayer *>(runningGame->p[0]);
-        setBtn(0);
-        ui->label_2->setText("等待...");
+        setButtonEnabled(0);
+        ui->statusLabel->setText("等待...");
         sendBlock.clear();
         QDataStream out(&sendBlock, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_4_0);
@@ -342,11 +331,11 @@ void GameWindow::on_pushButton_clicked() {
         break;
     }
     currentPid = 1;
-    pro->start();
-    ui->pushButton->setDisabled(true);
+    gameThread->start();
+    ui->startButton->setDisabled(true);
 }
 
-void GameWindow::on_pushButton_2_clicked() {
+void GameWindow::on_undoButton_clicked() {
     if (!currentPlayer) return;
     if (runningGame) {
         currentPlayer->mutex.lock();
@@ -354,7 +343,7 @@ void GameWindow::on_pushButton_2_clicked() {
         currentPlayer->hasCmd.wakeAll();
         currentPlayer->mutex.unlock();
         if (remotePlayer && --undo1 == 0)
-            allowUndo = 0, ui->pushButton_2->setEnabled(0);
+            allowUndo = 0, ui->undoButton->setEnabled(0);
     } else {
         sendBlock.clear();
         QDataStream out(&sendBlock, QIODevice::WriteOnly);
@@ -366,11 +355,11 @@ void GameWindow::on_pushButton_2_clicked() {
         tcpSocket->write(sendBlock);
         tcpSocket->waitForBytesWritten();
         tcpSocket->flush();
-        if (--undo2 == 0) allowUndo = 0, ui->pushButton_2->setEnabled(0);
+        if (--undo2 == 0) allowUndo = 0, ui->undoButton->setEnabled(0);
     }
 }
 
-void GameWindow::on_pushButton_3_clicked() {
+void GameWindow::on_aiButton_clicked() {
     if (!currentPlayer) return;
     if (runningGame) {
         currentPlayer->mutex.lock();
@@ -388,7 +377,7 @@ void GameWindow::on_pushButton_3_clicked() {
         tcpSocket->write(sendBlock);
         tcpSocket->waitForBytesWritten();
         tcpSocket->flush();
-        enableAI(0);
+        setAIButtonEnabled(0);
     }
 }
 
@@ -457,7 +446,7 @@ void GameWindow::readDataClient() {
     } else {
         clientCtrl.run(c, in);
         if (c == GAMEOVER) {
-            setBtn(0);
+            setButtonEnabled(0);
             if (currentPlayer) delete currentPlayer;
             if (waitPlayer) delete waitPlayer;
             QString str;
@@ -465,7 +454,7 @@ void GameWindow::readDataClient() {
                 str = "平局！";
             else
                 str = "玩家" + QString::number(winnerid) + "赢了! ";
-            ui->label_2->setText("游戏结束！");
+            ui->statusLabel->setText("游戏结束！");
             QMessageBox::information(this, "游戏结束", str, QMessageBox::Yes,
                                      QMessageBox::Yes);
         }
@@ -490,12 +479,12 @@ void GameWindow::sendGameInfo() {
     qDebug() << sendBlock.toHex();
 }
 
-void GameWindow::enableAI(bool f) {
+void GameWindow::setAIButtonEnabled(bool f) {
     qDebug() << "set" << f;
-    ui->pushButton_3->setEnabled(f);
+    ui->aiButton->setEnabled(f);
 }
 
-void GameWindow::disc() {
+void GameWindow::exitDisconnected() {
     QMessageBox::critical(this, "连接失败", "无法连接，即将退出");
     close();
 }

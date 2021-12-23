@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>508</width>
-    <height>197</height>
+    <width>447</width>
+    <height>250</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,35 +17,217 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>12</x>
-      <y>4</y>
-      <width>71</width>
+      <x>11</x>
+      <y>10</y>
+      <width>104</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>选择棋子</string>
+     <string>人机 / 本地双人</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="localButton">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>70</y>
-      <width>121</width>
-      <height>41</height>
+      <x>78</x>
+      <y>100</y>
+      <width>99</width>
+      <height>27</height>
      </rect>
     </property>
     <property name="text">
      <string>开始本地游戏</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="serverButton">
+    <property name="geometry">
+     <rect>
+      <x>243</x>
+      <y>148</y>
+      <width>93</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>启动服务器</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="clientButton">
+    <property name="geometry">
+     <rect>
+      <x>343</x>
+      <y>148</y>
+      <width>93</width>
+      <height>29</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>连接服务器</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="hostLineEdit">
+    <property name="geometry">
+     <rect>
+      <x>12</x>
+      <y>150</y>
+      <width>171</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>123.207.20.180</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="portLineEdit">
+    <property name="geometry">
+     <rect>
+      <x>185</x>
+      <y>150</y>
+      <width>51</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>10493</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="win1CheckBox">
+    <property name="geometry">
+     <rect>
+      <x>192</x>
+      <y>20</y>
+      <width>111</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>主机连五警告</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="win2CheckBox">
+    <property name="geometry">
+     <rect>
+      <x>192</x>
+      <y>54</y>
+      <width>117</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>客机连五警告</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ai1CheckBox">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>20</y>
+      <width>102</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>主机AI辅助</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ai2CheckBox">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>54</y>
+      <width>102</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>客机AI辅助</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="banCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>78</x>
+      <y>40</y>
+      <width>57</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>禁手</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="infoBanCheckBox">
+    <property name="geometry">
+     <rect>
+      <x>78</x>
+      <y>70</y>
+      <width>87</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>禁手提示</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="undo1LineEdit">
+    <property name="geometry">
+     <rect>
+      <x>388</x>
+      <y>85</y>
+      <width>41</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>233</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="undo2LineEdit">
+    <property name="geometry">
+     <rect>
+      <x>388</x>
+      <y>115</y>
+      <width>41</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>233</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label2">
+    <property name="geometry">
+     <rect>
+      <x>291</x>
+      <y>115</y>
+      <width>90</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>客机悔棋次数</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label1">
+    <property name="geometry">
+     <rect>
+      <x>291</x>
+      <y>85</y>
+      <width>90</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>主机悔棋次数</string>
+    </property>
+   </widget>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>11</x>
-      <y>28</y>
-      <width>89</width>
+      <x>12</x>
+      <y>40</y>
+      <width>59</width>
       <height>88</height>
      </rect>
     </property>
@@ -69,198 +251,19 @@
        <property name="text">
         <string>双人</string>
        </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
     </layout>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>130</y>
-      <width>93</width>
-      <height>29</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>启动服务器</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_4">
-    <property name="geometry">
-     <rect>
-      <x>410</x>
-      <y>130</y>
-      <width>93</width>
-      <height>29</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>连接服务器</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="hostLineEdit">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>130</y>
-      <width>211</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>123.207.20.180</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="portLineEdit">
-    <property name="geometry">
-     <rect>
-      <x>230</x>
-      <y>130</y>
-      <width>71</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>10493</string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="win1CheckBox">
-    <property name="geometry">
-     <rect>
-      <x>230</x>
-      <y>10</y>
-      <width>121</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>主机连五警告</string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="win2CheckBox">
-    <property name="geometry">
-     <rect>
-      <x>230</x>
-      <y>30</y>
-      <width>121</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>客机连五警告</string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="ai1CheckBox">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>10</y>
-      <width>98</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>主机AI辅助</string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="ai2CheckBox">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>30</y>
-      <width>98</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>客机AI辅助</string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="banCheckBox">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>20</y>
-      <width>98</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>禁手</string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="infoBanCheckBox">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>40</y>
-      <width>98</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>禁手提示</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="undo1LineEdit">
-    <property name="geometry">
-     <rect>
-      <x>430</x>
-      <y>60</y>
-      <width>71</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>233</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="undo2LineEdit">
-    <property name="geometry">
-     <rect>
-      <x>430</x>
-      <y>90</y>
-      <width>71</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>233</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_3">
-    <property name="geometry">
-     <rect>
-      <x>330</x>
-      <y>90</y>
-      <width>91</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>客机悔棋次数</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_4">
-    <property name="geometry">
-     <rect>
-      <x>330</x>
-      <y>60</y>
-      <width>91</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>主机悔棋次数</string>
-    </property>
-   </widget>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>60</y>
-      <width>101</width>
+      <x>191</x>
+      <y>81</y>
+      <width>89</width>
       <height>57</height>
      </rect>
     </property>
@@ -269,6 +272,9 @@
       <widget class="QRadioButton" name="Type_4">
        <property name="text">
         <string>主机执黑</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -287,7 +293,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>508</width>
+     <width>447</width>
      <height>26</height>
     </rect>
    </property>

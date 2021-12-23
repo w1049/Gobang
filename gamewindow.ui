@@ -16,22 +16,22 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>641</x>
+     <x>640</x>
      <y>20</y>
-     <width>97</width>
-     <height>158</height>
+     <width>100</width>
+     <height>160</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <widget class="QLabel" name="label_2">
+     <widget class="QLabel" name="statusLabel">
       <property name="text">
        <string/>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QLabel" name="label">
+     <widget class="QLabel" name="scoresLabel">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -46,21 +46,21 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="startButton">
         <property name="text">
          <string>开始游戏</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="undoButton">
         <property name="text">
          <string>悔棋</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_3">
+       <widget class="QPushButton" name="aiButton">
         <property name="text">
          <string>AI辅助</string>
         </property>

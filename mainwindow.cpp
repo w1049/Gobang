@@ -19,7 +19,7 @@ extern cpv banned;
 extern cpv win5;
 extern ChessPiece rcmd;
 extern int winnerid;
-extern MyThread *pro;
+extern MyThread *gameThread;
 extern int currentPid;
 }  // namespace render
 using namespace render;
@@ -37,8 +37,6 @@ using namespace GameServer;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
-    ui->Type_3->setChecked(true);
-    ui->Type_4->setChecked(true);
     tcpServer = new QTcpServer(this);
     tcpSocket = new QTcpSocket(this);
     connect(tcpServer, &QTcpServer::newConnection, this,
@@ -51,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow() { delete ui; }
 
-void MainWindow::on_pushButton_clicked() {
+void MainWindow::on_localButton_clicked() {
     int type = 3;
     bool mode = ui->banCheckBox->isChecked();
     infoBan = ui->infoBanCheckBox->isChecked();
@@ -79,7 +77,7 @@ void MainWindow::connectClient() {
     undo2 = ui->undo2LineEdit->text().toInt();
     GW = new GameWindow(type, mode);
     connect(clientConnection, &QAbstractSocket::disconnected, GW,
-            &GameWindow::disc);
+            &GameWindow::exitDisconnected);
     GW->setAttribute(Qt::WA_DeleteOnClose);
     connect(clientConnection, &QIODevice::readyRead, GW, &GameWindow::readData);
     in.setDevice(clientConnection);
@@ -93,16 +91,16 @@ void MainWindow::connectServer() {
     GW = new GameWindow(6, 0);  // 实际上无所谓的数字
     GW->setAttribute(Qt::WA_DeleteOnClose);
     connect(tcpSocket, &QIODevice::readyRead, GW, &GameWindow::readDataClient);
-    connect(tcpSocket, &QAbstractSocket::disconnected, GW, &GameWindow::disc);
+    connect(tcpSocket, &QAbstractSocket::disconnected, GW, &GameWindow::exitDisconnected);
     // this->close();
 }
 
-void MainWindow::on_pushButton_2_clicked() {
+void MainWindow::on_serverButton_clicked() {
     if (tcpServer->isListening()) {
         tcpServer->close();
-        ui->pushButton_2->setText("启动服务器");
-        ui->pushButton->setEnabled(true);
-        ui->pushButton_4->setEnabled(true);
+        ui->serverButton->setText("启动服务器");
+        ui->localButton->setEnabled(true);
+        ui->clientButton->setEnabled(true);
         ui->hostLineEdit->setReadOnly(false);
         ui->portLineEdit->setReadOnly(false);
     } else {
@@ -113,9 +111,9 @@ void MainWindow::on_pushButton_2_clicked() {
                                       .arg(tcpServer->errorString()));
             return;
         }
-        ui->pushButton_2->setText("终止服务器");
-        ui->pushButton->setEnabled(false);
-        ui->pushButton_4->setEnabled(false);
+        ui->serverButton->setText("终止服务器");
+        ui->localButton->setEnabled(false);
+        ui->clientButton->setEnabled(false);
         ui->hostLineEdit->setReadOnly(true);
         ui->portLineEdit->setReadOnly(true);
         QMessageBox::information(this, "服务器", "成功开启服务器");
@@ -124,42 +122,37 @@ void MainWindow::on_pushButton_2_clicked() {
 
 void MainWindow::displayError(QAbstractSocket::SocketError socketError) {
     tcpSocket->abort();  // 由于不是立即关闭，如果快速点击启动服务器会有bug
-    ui->pushButton->setEnabled(true);
-    ui->pushButton_2->setEnabled(true);
-    ui->pushButton_4->setEnabled(true);
+    ui->localButton->setEnabled(true);
+    ui->serverButton->setEnabled(true);
+    ui->clientButton->setEnabled(true);
     ui->hostLineEdit->setEnabled(true);
     ui->portLineEdit->setEnabled(true);
     switch (socketError) {
     case QAbstractSocket::RemoteHostClosedError: break;
     case QAbstractSocket::HostNotFoundError:
-        QMessageBox::information(this, tr("客户端"),
-                                 tr("The host was not found. Please check the "
-                                    "host name and port settings."));
+        QMessageBox::information(this, "客户端",
+                                 "服务器未找到。请检查地址与端口。");
         break;
     case QAbstractSocket::ConnectionRefusedError:
-        QMessageBox::information(this, tr("客户端"),
-                                 tr("The connection was refused by the peer. "
-                                    "Make sure the fortune server is running, "
-                                    "and check that the host name and port "
-                                    "settings are correct."));
+        QMessageBox::information(this, "客户端",
+                                 "连接被拒绝。确保服务器已开启，并检查地址与端口。 ");
         break;
     default:
-        QMessageBox::information(this, tr("客户端"),
-                                 tr("The following error occurred: %1.")
+        QMessageBox::information(this, "客户端",
+                                 tr("发生错误: %1.")
                                      .arg(tcpSocket->errorString()));
     }
 }
 
-void MainWindow::on_pushButton_4_clicked() {
+void MainWindow::on_clientButton_clicked() {
     tcpSocket->abort();
     in.setDevice(tcpSocket);
     in.setVersion(QDataStream::Qt_4_0);
-    ui->pushButton->setEnabled(false);
-    ui->pushButton_2->setEnabled(false);
-    ui->pushButton_4->setEnabled(false);
+    ui->localButton->setEnabled(false);
+    ui->serverButton->setEnabled(false);
+    ui->clientButton->setEnabled(false);
     ui->hostLineEdit->setEnabled(false);
     ui->portLineEdit->setEnabled(false);
     tcpSocket->connectToHost(ui->hostLineEdit->text(),
                              ui->portLineEdit->text().toInt());
 }
-// 清理资源：关闭时，掉线时

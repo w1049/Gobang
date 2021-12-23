@@ -115,7 +115,7 @@ void QtNetGame::infoRecommend(const ChessPiece& p) {
     if (this->p[p.getPid() - 1]->getType() == 1) {
         drawmutex.lock();
         rcmd = p;
-        GW->enableAI(1);
+        GW->setAIButtonEnabled(1);
         emit upd(0);
         drawmutex.unlock();
     } else {
