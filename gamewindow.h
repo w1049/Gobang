@@ -32,10 +32,11 @@ private slots:
     void on_pushButton_2_clicked();
     void on_pushButton_3_clicked();
 
-public slots:  // private?
+public slots:
     void readData();
     void sendData();
     void readDataClient();
+    void disc();
 
 private:
     void init();

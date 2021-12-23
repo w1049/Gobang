@@ -16,7 +16,7 @@ void QtPlayer::infoFailed(const ChessPiece&, int) {
     // 'A') << (int)p.getX() + 1 << "下棋." << '\n';
 }
 
-extern GameWindow *GW;
+extern GameWindow* GW;
 int QtPlayer::command(const ChessPad& pad) {
     ChessPiece p;
     int reason;
@@ -28,7 +28,7 @@ int QtPlayer::command(const ChessPad& pad) {
             return 1;
         } else if (cmd == 2) {
             mutex.unlock();
-            GW->enableAI(0);
+            if (pid == 1) GW->enableAI(0);
             return 2;
         }
         reason = pad.checkState(p.set(pid, Tx, Ty));

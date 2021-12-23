@@ -10,7 +10,7 @@
 #include "QtNetGame.h"
 #include "QtPlayer.h"
 #include "mainwindow.h"
-#include "mythread.h"
+#include "MyThread.h"
 #include "qbrush.h"
 #include "qevent.h"
 #include "qpainter.h"
@@ -94,7 +94,6 @@ GameWindow::GameWindow(int type, bool mode, QWidget *parent)
     ui->setupUi(this);
     setMouseTracking(true);
     if (type < 6) init();
-
 }
 void GameWindow::init() {
     if (type < 6) {
@@ -108,13 +107,13 @@ void GameWindow::init() {
         allowAI = ai2;
         allowUndo = undo2;
         switch (type) {
-        case 6: // 客机白
+        case 6:  // 客机白
             currentPlayer = nullptr;
             waitPlayer = new QtPlayer(2);
             setBtn(0);
             ui->label_2->setText("等待...");
             break;
-        case 7: // 客机黑
+        case 7:  // 客机黑
             currentPlayer = new QtPlayer(1);
             waitPlayer = nullptr;
             setBtn(1);
@@ -259,13 +258,14 @@ void GameWindow::mouseReleaseEvent(QMouseEvent *) {
     } else {
         sendBlock.clear();
         QDataStream out(&sendBlock, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_5_10);
+        out.setVersion(QDataStream::Qt_4_0);
         out << (quint16)0;
         out << CLICK << (int8_t)moveX << (int8_t)moveY;
         out.device()->seek(0);
         out << (quint16)(sendBlock.size() - sizeof(quint16));
-        tcpSocket->write(sendBlock);tcpSocket->waitForBytesWritten();
-        tcpSocket->flush(); 
+        tcpSocket->write(sendBlock);
+        tcpSocket->waitForBytesWritten();
+        tcpSocket->flush();
     }
 }
 
@@ -297,7 +297,7 @@ void GameWindow::on_pushButton_clicked() {
         setBtn(0);
         ui->label_2->setText("等待...");
         break;
-    case 4: // 主机黑
+    case 4:  // 主机黑
         allowAI = ai1;
         allowUndo = undo1;
         runningGame = new QtNetGame(1, mode);
@@ -307,7 +307,7 @@ void GameWindow::on_pushButton_clicked() {
         setBtn(1);
         ui->label_2->setText("请落子");
         break;
-    case 5: // 主机白
+    case 5:  // 主机白
         allowAI = ai1;
         allowUndo = undo1;
         runningGame = new QtNetGame(2, mode);
@@ -337,17 +337,19 @@ void GameWindow::on_pushButton_2_clicked() {
         currentPlayer->cmd = 1;
         currentPlayer->hasCmd.wakeAll();
         currentPlayer->mutex.unlock();
-        if (remotePlayer && --undo1 == 0) allowUndo = 0, ui->pushButton_2->setEnabled(0);
+        if (remotePlayer && --undo1 == 0)
+            allowUndo = 0, ui->pushButton_2->setEnabled(0);
     } else {
         sendBlock.clear();
         QDataStream out(&sendBlock, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_5_10);
+        out.setVersion(QDataStream::Qt_4_0);
         out << (quint16)0;
         out << COMMAND << 1;
         out.device()->seek(0);
         out << (quint16)(sendBlock.size() - sizeof(quint16));
-        tcpSocket->write(sendBlock);tcpSocket->waitForBytesWritten();
-        tcpSocket->flush(); 
+        tcpSocket->write(sendBlock);
+        tcpSocket->waitForBytesWritten();
+        tcpSocket->flush();
         if (--undo2 == 0) allowUndo = 0, ui->pushButton_2->setEnabled(0);
     }
 }
@@ -362,13 +364,15 @@ void GameWindow::on_pushButton_3_clicked() {
     } else {
         sendBlock.clear();
         QDataStream out(&sendBlock, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_5_10);
+        out.setVersion(QDataStream::Qt_4_0);
         out << (quint16)0;
         out << COMMAND << 2;
         out.device()->seek(0);
         out << (quint16)(sendBlock.size() - sizeof(quint16));
         tcpSocket->write(sendBlock);
-        tcpSocket->waitForBytesWritten();tcpSocket->flush(); 
+        tcpSocket->waitForBytesWritten();
+        tcpSocket->flush();
+        enableAI(0);
     }
 }
 
@@ -398,7 +402,8 @@ void GameWindow::readData() {
 void GameWindow::sendData() {
     blockMutex.lock();
     clientConnection->write(sendBlock);
-    clientConnection->waitForBytesWritten();clientConnection->flush(); 
+    clientConnection->waitForBytesWritten();
+    clientConnection->flush();
     blockCond.wakeAll();
     blockMutex.unlock();
     qDebug() << sendBlock.toHex();
@@ -423,9 +428,13 @@ void GameWindow::readDataClient() {
         str = tr("主机棋子 - ") + (type == 6 ? tr("黑\n") : tr("白\n"));
         str += tr("禁手 - ") + (mode ? tr("开\n") : tr("关\n"));
         str += tr("禁手提示 - ") + (infoBan ? tr("开\n") : tr("关\n"));
-        str += tr("连五警告 - 主机") + (infoWin1 ? tr("开 客机") : tr("关 客机")) + (infoWin2 ? tr("开\n") : tr("关\n"));
-        str += tr("AI 辅助 - 主机") + (ai1 ? tr("开 客机") : tr("关 客机")) + (ai2 ? tr("开\n") : tr("关\n"));
-        str += tr("允许悔棋次数 - 主机") + QString::number(undo1) + tr(" 客机") + QString::number(undo2);
+        str += tr("连五警告 - 主机") +
+               (infoWin1 ? tr("开 客机") : tr("关 客机")) +
+               (infoWin2 ? tr("开\n") : tr("关\n"));
+        str += tr("AI 辅助 - 主机") + (ai1 ? tr("开 客机") : tr("关 客机")) +
+               (ai2 ? tr("开\n") : tr("关\n"));
+        str += tr("允许悔棋次数 - 主机") + QString::number(undo1) +
+               tr(" 客机") + QString::number(undo2);
         QMessageBox::information(this, "服务器信息", str, QMessageBox::Yes,
                                  QMessageBox::Yes);
         init();
@@ -454,7 +463,7 @@ void GameWindow::readDataClient() {
 void GameWindow::sendGameInfo() {
     sendBlock.clear();
     QDataStream out(&sendBlock, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_10);
+    out.setVersion(QDataStream::Qt_4_0);
     out << (quint16)0;
     out << GAMEINFO;
     out << type << mode << infoBan << infoWin1 << infoWin2 << ai1 << ai2;
@@ -462,11 +471,17 @@ void GameWindow::sendGameInfo() {
     out.device()->seek(0);
     out << (quint16)(sendBlock.size() - sizeof(quint16));
     clientConnection->write(sendBlock);
-    clientConnection->waitForBytesWritten();clientConnection->flush(); 
+    clientConnection->waitForBytesWritten();
+    clientConnection->flush();
     qDebug() << sendBlock.toHex();
 }
 
 void GameWindow::enableAI(bool f) {
     qDebug() << "set" << f;
     ui->pushButton_3->setEnabled(f);
+}
+
+void GameWindow::disc() {
+    QMessageBox::critical(this, "连接失败", "无法连接，即将退出");
+    close();
 }

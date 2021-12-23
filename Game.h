@@ -20,8 +20,8 @@ public:
 
 private:
     bool step(bool = 0);  // 棋局前进一步，bool = 1 表示直接判负
-    bool undo();                                         // 悔一步棋
-    virtual bool canUndo(int pid); // 是否可以悔棋
+    bool undo();          // 悔一步棋
+    virtual bool canUndo(int pid);                       // 是否可以悔棋
     virtual void infoRecommend(const ChessPiece &) = 0;  // 推荐棋子
     virtual void infoTips(int) = 0;                      // 显示局势分等
     virtual void infoGameOver(int pid) = 0;  // 提示游戏结束. pid = 3 则平局

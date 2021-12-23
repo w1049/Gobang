@@ -34,9 +34,7 @@ bool Game::undo() {
     infoRemove();
     return 1;
 }
-bool Game::canUndo(int) {
-    return 1;
-}
+bool Game::canUndo(int) { return 1; }
 
 void Game::infoRemove() { infoPlace(ChessPiece(0, -1, -1)); }
 

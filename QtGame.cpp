@@ -15,6 +15,9 @@ extern int winnerid;
 extern int points;
 }  // namespace render
 using namespace render;
+namespace GameServer {
+extern bool infoBan;
+}
 
 class GameWindow;
 extern GameWindow* GW;
@@ -62,11 +65,12 @@ void QtGame::infoTips(int pid) {
     banned.clear();
     win5.clear();
     ChessPiece p;
-    for (int8_t x = 0; x < 15; x++)
-        for (int8_t y = 0; y < 15; y++) {
-            int code = chessPad->checkState(p.set(pid, x, y));
-            if (code == 3 || code == 4 || code == 5) banned.push_back(p);
-        }
+    if (GameServer::infoBan)
+        for (int8_t x = 0; x < 15; x++)
+            for (int8_t y = 0; y < 15; y++) {
+                int code = chessPad->checkState(p.set(pid, x, y));
+                if (code == 3 || code == 4 || code == 5) banned.push_back(p);
+            }
     for (int8_t x = 0; x < 15; x++)
         for (int8_t y = 0; y < 15; y++) {
             if (!chessPad->checkState(p.set(3 - pid, x, y)) &&

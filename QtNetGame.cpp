@@ -60,7 +60,7 @@ QDataStream& operator>>(QDataStream& i, ChessPiece& p) {
 }
 
 bool QtNetGame::canUndo(int pid) {
-    QtPlayer *player = dynamic_cast<QtPlayer*>(p[pid - 1]);
+    QtPlayer* player = dynamic_cast<QtPlayer*>(p[pid - 1]);
     if (chessPad->getPiecesList().size() < 3 && player->getPid() == 2) return 0;
     if (player->undoLimit) {
         --player->undoLimit;
@@ -70,7 +70,7 @@ bool QtNetGame::canUndo(int pid) {
             blockMutex.lock();
             sendBlock.clear();
             QDataStream out(&sendBlock, QIODevice::WriteOnly);
-            out.setVersion(QDataStream::Qt_5_10);
+            out.setVersion(QDataStream::Qt_4_0);
             out << (quint16)0;
             out << STOPUNDO;
             out.device()->seek(0);
@@ -82,7 +82,6 @@ bool QtNetGame::canUndo(int pid) {
 
         return 0;
     }
-
 }
 
 void QtNetGame::infoRemove() {
@@ -91,7 +90,7 @@ void QtNetGame::infoRemove() {
     blockMutex.lock();
     sendBlock.clear();
     QDataStream out(&sendBlock, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_10);
+    out.setVersion(QDataStream::Qt_4_0);
     out << (quint16)0;
     out << REMOVE << (int8_t)turn;
     out.device()->seek(0);
@@ -123,7 +122,7 @@ void QtNetGame::infoRecommend(const ChessPiece& p) {
         blockMutex.lock();
         sendBlock.clear();
         QDataStream out(&sendBlock, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_5_10);
+        out.setVersion(QDataStream::Qt_4_0);
         out << (quint16)0;
         out << RECOMMEND << p;
         out.device()->seek(0);
@@ -140,11 +139,11 @@ void QtNetGame::infoTips(int pid) {
     points = -AI::g(3 - turn, *chessPad);
     ChessPiece p;
     if (infoBan)
-    for (int8_t x = 0; x < 15; x++)
-        for (int8_t y = 0; y < 15; y++) {
-            int code = chessPad->checkState(p.set(pid, x, y));
-            if (code == 3 || code == 4 || code == 5) banned.push_back(p);
-        }
+        for (int8_t x = 0; x < 15; x++)
+            for (int8_t y = 0; y < 15; y++) {
+                int code = chessPad->checkState(p.set(pid, x, y));
+                if (code == 3 || code == 4 || code == 5) banned.push_back(p);
+            }
     for (int8_t x = 0; x < 15; x++)
         for (int8_t y = 0; y < 15; y++) {
             if (!chessPad->checkState(p.set(3 - pid, x, y)) &&
@@ -168,7 +167,7 @@ void QtNetGame::infoTips(int pid) {
         blockMutex.lock();
         sendBlock.clear();
         QDataStream out(&sendBlock, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_5_10);
+        out.setVersion(QDataStream::Qt_4_0);
         out << (quint16)0;
 
         out << TIPS << points;
@@ -190,7 +189,7 @@ void QtNetGame::infoGameOver(int pid) {
     blockMutex.lock();
     sendBlock.clear();
     QDataStream out(&sendBlock, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_10);
+    out.setVersion(QDataStream::Qt_4_0);
     out << (quint16)0;
     qDebug() << "infoGameOver" << pid;
     out << GAMEOVER << (int8_t)pid;
@@ -210,7 +209,7 @@ void QtNetGame::infoPlace(const ChessPiece& p) {
     blockMutex.lock();
     sendBlock.clear();
     QDataStream out(&sendBlock, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_10);
+    out.setVersion(QDataStream::Qt_4_0);
     out << (quint16)0;
     out << PLACE << p << (int8_t)turn;
     // qDebug() << p.getX() << p.getY();

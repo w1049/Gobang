@@ -24,7 +24,7 @@ SOURCES += \
     gamewindow.cpp \
     main.cpp \
     mainwindow.cpp \
-    mythread.cpp
+    MyThread.cpp
 
 HEADERS += \
     AIPlayer.h \
@@ -40,7 +40,7 @@ HEADERS += \
     QtPlayer.h \
     gamewindow.h \
     mainwindow.h \
-    mythread.h
+    MyThread.h
 
 FORMS += \
     gamewindow.ui \
