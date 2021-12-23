@@ -77,8 +77,8 @@ void MainWindow::connectClient() {
     connect(clientConnection, &QAbstractSocket::disconnected, clientConnection,
             &QObject::deleteLater);
     int type = 4, mode = 0;
-    infoBan = 1, infoWin1 = 1, infoWin2 = 1, ai1 = 1, ai2 = 0;
-    undo1 = 2, undo2 = 1;
+    infoBan = 1, infoWin1 = 1, infoWin2 = 0, ai1 = 1, ai2 = 0;
+    undo1 = 2, undo2 = 5;
     GW = new GameWindow(type, mode);
     GW->setAttribute(Qt::WA_DeleteOnClose);
     connect(clientConnection, &QIODevice::readyRead, GW, &GameWindow::readData);

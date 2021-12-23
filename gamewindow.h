@@ -20,6 +20,7 @@ public:
     void upd(int = 0);
     void dealDone();
     void sendGameInfo();
+    void enableAI(bool);
 
 protected:
     void paintEvent(QPaintEvent *);

@@ -22,7 +22,7 @@ private:
     void infoRemove();
 
 signals:
-    void upd(int x);
+    void upd(int);
 };
 
 #endif

@@ -49,6 +49,7 @@ void QtGameClient::infoRecommend(QDataStream& in) {
     in >> p;
     // drawmutex.lock();
     rcmd = p;
+    GW->enableAI(1);
     GW->upd();
     // drawmutex.unlock();
 }

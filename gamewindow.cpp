@@ -264,8 +264,8 @@ void GameWindow::mouseReleaseEvent(QMouseEvent *) {
         out << CLICK << (int8_t)moveX << (int8_t)moveY;
         out.device()->seek(0);
         out << (quint16)(sendBlock.size() - sizeof(quint16));
-        tcpSocket->write(sendBlock);
-        tcpSocket->flush();
+        tcpSocket->write(sendBlock);tcpSocket->waitForBytesWritten();
+        tcpSocket->flush(); 
     }
 }
 
@@ -346,9 +346,8 @@ void GameWindow::on_pushButton_2_clicked() {
         out << COMMAND << 1;
         out.device()->seek(0);
         out << (quint16)(sendBlock.size() - sizeof(quint16));
-        tcpSocket->write(sendBlock);
-        tcpSocket->flush();
-        tcpSocket->waitForBytesWritten();
+        tcpSocket->write(sendBlock);tcpSocket->waitForBytesWritten();
+        tcpSocket->flush(); 
         if (--undo2 == 0) allowUndo = 0, ui->pushButton_2->setEnabled(0);
     }
 }
@@ -369,7 +368,7 @@ void GameWindow::on_pushButton_3_clicked() {
         out.device()->seek(0);
         out << (quint16)(sendBlock.size() - sizeof(quint16));
         tcpSocket->write(sendBlock);
-        tcpSocket->flush();
+        tcpSocket->waitForBytesWritten();tcpSocket->flush(); 
     }
 }
 
@@ -399,9 +398,10 @@ void GameWindow::readData() {
 void GameWindow::sendData() {
     blockMutex.lock();
     clientConnection->write(sendBlock);
-    clientConnection->flush();
+    clientConnection->waitForBytesWritten();clientConnection->flush(); 
     blockCond.wakeAll();
     blockMutex.unlock();
+    qDebug() << sendBlock.toHex();
 }
 
 void GameWindow::readDataClient() {
@@ -410,9 +410,10 @@ void GameWindow::readDataClient() {
         in >> blockSize;
     }
     if (tcpSocket->bytesAvailable() < blockSize) return;
-
+    qDebug() << tcpSocket->bytesAvailable() << "vs" << blockSize;
     int8_t c;
     in >> c;
+    qDebug() << c;
     if (c == GAMEINFO) {
         qDebug() << "INFO!";
         in >> type >> mode >> infoBan >> infoWin1 >> infoWin2 >> ai1 >> ai2;
@@ -428,28 +429,26 @@ void GameWindow::readDataClient() {
         QMessageBox::information(this, "服务器信息", str, QMessageBox::Yes,
                                  QMessageBox::Yes);
         init();
-        blockSize = 0;
-        return;
     } else if (c == STOPUNDO) {
         allowUndo = 0;
-        blockSize = 0;
-        return;
-    }
-    clientCtrl.run(c, in);
-    if (c == GAMEOVER) {
-        setBtn(0);
-        if (currentPlayer) delete currentPlayer;
-        if (waitPlayer) delete waitPlayer;
-        QString str;
-        if (winnerid == 3)
-            str = "平局！";
-        else
-            str = "玩家" + QString::number(winnerid) + "赢了! ";
-        ui->label_2->setText("游戏结束！");
-        QMessageBox::information(this, "游戏结束", str, QMessageBox::Yes,
-                                 QMessageBox::Yes);
+    } else {
+        clientCtrl.run(c, in);
+        if (c == GAMEOVER) {
+            setBtn(0);
+            if (currentPlayer) delete currentPlayer;
+            if (waitPlayer) delete waitPlayer;
+            QString str;
+            if (winnerid == 3)
+                str = "平局！";
+            else
+                str = "玩家" + QString::number(winnerid) + "赢了! ";
+            ui->label_2->setText("游戏结束！");
+            QMessageBox::information(this, "游戏结束", str, QMessageBox::Yes,
+                                     QMessageBox::Yes);
+        }
     }
     blockSize = 0;
+    if (tcpSocket->bytesAvailable()) readDataClient();
 }
 
 void GameWindow::sendGameInfo() {
@@ -463,6 +462,11 @@ void GameWindow::sendGameInfo() {
     out.device()->seek(0);
     out << (quint16)(sendBlock.size() - sizeof(quint16));
     clientConnection->write(sendBlock);
-    clientConnection->flush();
+    clientConnection->waitForBytesWritten();clientConnection->flush(); 
     qDebug() << sendBlock.toHex();
+}
+
+void GameWindow::enableAI(bool f) {
+    qDebug() << "set" << f;
+    ui->pushButton_3->setEnabled(f);
 }

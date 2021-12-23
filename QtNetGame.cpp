@@ -6,7 +6,6 @@
 #include "QtPlayer.h"
 #include "gamewindow.h"
 #include "mainwindow.h"
-
 namespace render {
 extern QMutex drawmutex;
 extern ChessPad currentPad;
@@ -62,6 +61,7 @@ QDataStream& operator>>(QDataStream& i, ChessPiece& p) {
 
 bool QtNetGame::canUndo(int pid) {
     QtPlayer *player = dynamic_cast<QtPlayer*>(p[pid - 1]);
+    if (chessPad->getPiecesList().size() < 3 && player->getPid() == 2) return 0;
     if (player->undoLimit) {
         --player->undoLimit;
         return 1;
@@ -116,6 +116,7 @@ void QtNetGame::infoRecommend(const ChessPiece& p) {
     if (this->p[p.getPid() - 1]->getType() == 1) {
         drawmutex.lock();
         rcmd = p;
+        GW->enableAI(1);
         emit upd(0);
         drawmutex.unlock();
     } else {

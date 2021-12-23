@@ -3,6 +3,7 @@
 #include <QDebug>
 
 #include "ChessPiece.h"
+#include "gamewindow.h"
 
 QtPlayer::QtPlayer(int p, int type) : Player(p, type) {}
 
@@ -14,9 +15,8 @@ void QtPlayer::infoFailed(const ChessPiece&, int) {
     // qDebug() << "由于原因" << (int)reason << ", 你不能在" << char(p.getY() +
     // 'A') << (int)p.getX() + 1 << "下棋." << '\n';
 }
-// ask
-// undo
-// H8
+
+extern GameWindow *GW;
 int QtPlayer::command(const ChessPad& pad) {
     ChessPiece p;
     int reason;
@@ -28,6 +28,7 @@ int QtPlayer::command(const ChessPad& pad) {
             return 1;
         } else if (cmd == 2) {
             mutex.unlock();
+            GW->enableAI(0);
             return 2;
         }
         reason = pad.checkState(p.set(pid, Tx, Ty));

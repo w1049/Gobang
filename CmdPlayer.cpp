@@ -19,9 +19,7 @@ void CmdPlayer::infoFailed(const ChessPiece& p, int reason) {
     cout << "由于原因" << reason << ", 你不能在" << char(p.getY() + 'A')
          << (int)p.getX() + 1 << "下棋." << endl;
 }
-// ask
-// undo
-// H8
+
 int CmdPlayer::command(const ChessPad& pad) {
     ChessPiece p;
     int8_t reason;
