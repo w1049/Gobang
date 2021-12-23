@@ -62,9 +62,11 @@ void QtGameClient::infoTips(QDataStream& in) {
     win5.clear();
     // read vectors and push
     in >> s1;
-    for (uint8_t i = 0; i < s1; i++) in >> p, banned.push_back(p);
+    for (uint8_t i = 0; i < s1; i++)
+        in >> p, banned.push_back(p);
     in >> s2;
-    for (uint8_t i = 0; i < s1; i++) in >> p, win5.push_back(p);
+    for (uint8_t i = 0; i < s2; i++)
+        in >> p, win5.push_back(p);
     GW->upd();
     // drawmutex.unlock();
 }

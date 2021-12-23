@@ -3,9 +3,9 @@
 #include <QDebug>
 
 #include "AIPlayer.h"
+#include "NetPlayer.h"
 #include "QtPlayer.h"
 #include "gamewindow.h"
-#include "NetPlayer.h"
 #include "mainwindow.h"
 
 namespace render {
@@ -24,7 +24,7 @@ namespace GameServer {
 extern QByteArray sendBlock;
 extern QMutex blockMutex;
 extern QWaitCondition blockCond;
-}
+}  // namespace GameServer
 using namespace GameServer;
 
 QtNetGame::QtNetGame(int type, bool mode) {
@@ -85,7 +85,10 @@ void QtNetGame::infoRemove() {
     sendBlock.clear();
     QDataStream out(&sendBlock, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_10);
+    out << (quint16)0;
     out << REMOVE << (int8_t)turn;
+    out.device()->seek(0);
+    out << (quint16)(sendBlock.size() - sizeof(quint16));
     emit sendData();
     blockCond.wait(&blockMutex);
     blockMutex.unlock();
@@ -100,8 +103,8 @@ void QtNetGame::infoRemove() {
 }
 
 void QtNetGame::infoRecommend(const ChessPiece& p) {
-    //send recommend
-    //send p
+    // send recommend
+    // send p
 
     if (this->p[p.getPid() - 1]->getType() == 1) {
         drawmutex.lock();
@@ -113,7 +116,10 @@ void QtNetGame::infoRecommend(const ChessPiece& p) {
         sendBlock.clear();
         QDataStream out(&sendBlock, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_5_10);
+        out << (quint16)0;
         out << RECOMMEND << p;
+        out.device()->seek(0);
+        out << (quint16)(sendBlock.size() - sizeof(quint16));
         emit sendData();
         blockCond.wait(&blockMutex);
         blockMutex.unlock();
@@ -145,20 +151,23 @@ void QtNetGame::infoTips(int pid) {
         drawmutex.unlock();
     } else {
         // if pid == remotepid then
-        //send tips
-        //send points
-        //send banned & win5
-        //send points and winnned win5
+        // send tips
+        // send points
+        // send banned & win5
+        // send points and winnned win5
         blockMutex.lock();
         sendBlock.clear();
         QDataStream out(&sendBlock, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_5_10);
+        out << (quint16)0;
 
         out << TIPS << points;
         out << (uint8_t)banned.size();
         for (auto p : banned) out << p;
         out << (uint8_t)win5.size();
         for (auto p : win5) out << p;
+        out.device()->seek(0);
+        out << (quint16)(sendBlock.size() - sizeof(quint16));
         emit sendData();
         blockCond.wait(&blockMutex);
         blockMutex.unlock();
@@ -172,8 +181,11 @@ void QtNetGame::infoGameOver(int pid) {
     sendBlock.clear();
     QDataStream out(&sendBlock, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_10);
+    out << (quint16)0;
     qDebug() << "infoGameOver" << pid;
     out << GAMEOVER << (int8_t)pid;
+    out.device()->seek(0);
+    out << (quint16)(sendBlock.size() - sizeof(quint16));
     emit sendData();
     blockCond.wait(&blockMutex);
     blockMutex.unlock();
@@ -183,14 +195,17 @@ void QtNetGame::infoGameOver(int pid) {
 
 void QtNetGame::infoPlace(const ChessPiece& p) {
     // send place
-    // send p 
+    // send p
     // send turn
     blockMutex.lock();
     sendBlock.clear();
     QDataStream out(&sendBlock, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_5_10);
+    out << (quint16)0;
     out << PLACE << p << (int8_t)turn;
-    qDebug() << p.getX() << p.getY();
+    // qDebug() << p.getX() << p.getY();
+    out.device()->seek(0);
+    out << (quint16)(sendBlock.size() - sizeof(quint16));
     emit sendData();
     blockCond.wait(&blockMutex);
     blockMutex.unlock();

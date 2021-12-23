@@ -13,10 +13,11 @@ public:
     ChessPiece getNextPiece(const ChessPad&);
     void infoFailed(const ChessPiece&, int);
     int command(const ChessPad&);
-    int8_t Tx, Ty;
+    int8_t Tx = -1, Ty = -1;
     int cmd = -1;
     QMutex mutex;
     QWaitCondition hasCmd;
+    int undoLimit = 0;
     // private:
 };
 

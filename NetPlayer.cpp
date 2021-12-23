@@ -6,17 +6,14 @@
 
 #include "ChessPiece.h"
 
-NetPlayer::NetPlayer(int p) : Player(p, 3), Tx(0), Ty(0) {}
+NetPlayer::NetPlayer(int p) : Player(p, 2) {}
 
 ChessPiece NetPlayer::getNextPiece(const ChessPad&) {
     return ChessPiece(pid, Tx, Ty);
 }
-namespace GameServer {
-extern QTcpSocket *clientConnection;
-}
 
 using namespace GameServer;
-void NetPlayer::infoFailed(const ChessPiece& p, int reason) {
+void NetPlayer::infoFailed(const ChessPiece&, int) {
     // qDebug() << "由于原因" << (int)reason << ", 你不能在" << char(p.getY() +
     // 'A') << (int)p.getX() + 1 << "下棋." << '\n';
 }

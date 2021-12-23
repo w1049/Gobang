@@ -4,13 +4,13 @@
 
 #include "ChessPiece.h"
 
-QtPlayer::QtPlayer(int p) : Player(p, 1), Tx(0), Ty(0) {}
+QtPlayer::QtPlayer(int p) : Player(p, 1) {}
 
 ChessPiece QtPlayer::getNextPiece(const ChessPad&) {
     return ChessPiece(pid, Tx, Ty);
 }
 
-void QtPlayer::infoFailed(const ChessPiece& p, int reason) {
+void QtPlayer::infoFailed(const ChessPiece&, int) {
     // qDebug() << "由于原因" << (int)reason << ", 你不能在" << char(p.getY() +
     // 'A') << (int)p.getX() + 1 << "下棋." << '\n';
 }

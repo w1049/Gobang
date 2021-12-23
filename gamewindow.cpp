@@ -1,13 +1,14 @@
 #include "gamewindow.h"
 
+#include <QDebug>
 #include <QMessageBox>
 #include <QMutex>
 #include <QThread>
 #include <string>
-#include "NetPlayer.h"
-#include "QtNetGame.h"
-#include <QDebug>
 
+#include "NetPlayer.h"
+#include "QtGameClient.h"
+#include "QtNetGame.h"
 #include "mainwindow.h"
 #include "mythread.h"
 #include "qbrush.h"
@@ -15,7 +16,6 @@
 #include "qpainter.h"
 #include "qpen.h"
 #include "ui_gamewindow.h"
-#include "QtGameClient.h"
 namespace render {
 QtGame *runningGame;
 QtPlayer *currentPlayer;
@@ -40,7 +40,7 @@ QMutex blockMutex;
 QWaitCondition blockCond;
 QtGameClient clientCtrl;
 extern QTcpSocket *tcpSocket;
-}
+}  // namespace GameServer
 using namespace GameServer;
 void GameWindow::upd(int pid) {
     if (pid && pid != currentPid) {
@@ -57,8 +57,9 @@ void GameWindow::upd(int pid) {
     }
     update();
 }
-// 数据完整性检验
+
 // 模式选择
+// 垃圾处理
 
 void GameWindow::dealDone() {
     ui->pushButton_2->setDisabled(true);
@@ -88,13 +89,15 @@ GameWindow::GameWindow(int type, bool mode, QWidget *parent)
         connect(this, &GameWindow::destroyed, this, &GameWindow::stopThread);
     } else {
         ui->pushButton->setDisabled(true);
-        switch(type) {
+        switch (type) {
         case 6:
             currentPlayer = nullptr;
-            waitPlayer = new QtPlayer(2);// dynamic_cast<QtPlayer *>(runningGame->p[1]);
+            waitPlayer = new QtPlayer(
+                2);  // dynamic_cast<QtPlayer *>(runningGame->p[1]);
             break;
         case 7:
-            currentPlayer = new QtPlayer(1);// dynamic_cast<QtPlayer *>(runningGame->p[0]);
+            currentPlayer = new QtPlayer(
+                1);  // dynamic_cast<QtPlayer *>(runningGame->p[0]);
             waitPlayer = nullptr;
             break;
         }
@@ -222,7 +225,7 @@ void GameWindow::mouseMoveEvent(QMouseEvent *event) {
     update();
 }
 
-QDataStream& operator<<(QDataStream&, const ChessPiece&);
+QDataStream &operator<<(QDataStream &, const ChessPiece &);
 
 void GameWindow::mouseReleaseEvent(QMouseEvent *) {
     if (!currentPlayer) return;
@@ -237,8 +240,12 @@ void GameWindow::mouseReleaseEvent(QMouseEvent *) {
         sendBlock.clear();
         QDataStream out(&sendBlock, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_5_10);
+        out << (quint16)0;
         out << CLICK << (int8_t)moveX << (int8_t)moveY;
+        out.device()->seek(0);
+        out << (quint16)(sendBlock.size() - sizeof(quint16));
         tcpSocket->write(sendBlock);
+        tcpSocket->flush();
     }
 }
 
@@ -300,8 +307,12 @@ void GameWindow::on_pushButton_2_clicked() {
         sendBlock.clear();
         QDataStream out(&sendBlock, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_5_10);
+        out << (quint16)0;
         out << COMMAND << 1;
+        out.device()->seek(0);
+        out << (quint16)(sendBlock.size() - sizeof(quint16));
         tcpSocket->write(sendBlock);
+        tcpSocket->flush();
     }
 }
 
@@ -316,13 +327,22 @@ void GameWindow::on_pushButton_3_clicked() {
         sendBlock.clear();
         QDataStream out(&sendBlock, QIODevice::WriteOnly);
         out.setVersion(QDataStream::Qt_5_10);
+        out << (quint16)0;
         out << COMMAND << 2;
+        out.device()->seek(0);
+        out << (quint16)(sendBlock.size() - sizeof(quint16));
         tcpSocket->write(sendBlock);
+        tcpSocket->flush();
     }
 }
 
+qint16 blockSize = 0;
 void GameWindow::readData() {
-    if (!remotePlayer) return;
+    if (blockSize == 0) {
+        if (clientConnection->bytesAvailable() < (int)sizeof(quint16)) return;
+        in >> blockSize;
+    }
+    if (clientConnection->bytesAvailable() < blockSize) return;
     int8_t c;
     in >> c;
     remotePlayer->mutex.lock();
@@ -335,29 +355,28 @@ void GameWindow::readData() {
         in >> remotePlayer->Ty;
         remotePlayer->hasCmd.wakeAll();
     }
+    blockSize = 0;
     remotePlayer->mutex.unlock();
 }
 
 void GameWindow::sendData() {
     blockMutex.lock();
-    qDebug() << sendBlock;
     clientConnection->write(sendBlock);
     clientConnection->flush();
     blockCond.wakeAll();
     blockMutex.unlock();
 }
 
-int blockSize = 0;
 void GameWindow::readDataClient() {
     if (blockSize == 0) {
-           if(tcpSocket->bytesAvailable() < (int)sizeof(quint16)) return;
-           in >> blockSize;
-        }
-    if(tcpSocket->bytesAvailable() < blockSize) return;
+        if (tcpSocket->bytesAvailable() < (int)sizeof(quint16)) return;
+        in >> blockSize;
+    }
+    if (tcpSocket->bytesAvailable() < blockSize) return;
 
     int8_t c;
     in >> c;
-    qDebug() << (int)c;
+    // qDebug() << (int)c;
     clientCtrl.run(c, in);
     if (c == GAMEOVER) {
         ui->pushButton_2->setDisabled(true);
