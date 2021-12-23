@@ -15,7 +15,6 @@ SOURCES += \
     CmdGame.cpp \
     CmdPlayer.cpp \
     Game.cpp \
-    OldMain.cpp \
     Player.cpp \
     QtGame.cpp \
     QtGameClient.cpp \

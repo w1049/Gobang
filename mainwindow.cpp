@@ -2,9 +2,9 @@
 
 #include <QThread>
 
+#include "MyThread.h"
 #include "QtNetGame.h"
 #include "gamewindow.h"
-#include "MyThread.h"
 #include "ui_mainwindow.h"
 
 GameWindow *GW;

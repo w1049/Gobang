@@ -1,4 +1,3 @@
-/*
 #include <iostream>
 
 #include "CmdGame.h"
@@ -10,7 +9,7 @@ using std::string;
 
 int main() {
     while (1) {
-        cout << "1：人机\n2：机人\n3：开服\n4：连接\n其他：人人" << endl;
+        cout << "1：人机\n2：机人\n其他：人人" << endl;
         char x = cin.get();
         cin.get();
         cout << "0：无禁手\n1：禁手" << endl;
@@ -26,4 +25,3 @@ int main() {
     }
     return 0;
 }
-*/

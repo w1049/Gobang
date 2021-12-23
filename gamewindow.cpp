@@ -6,11 +6,11 @@
 #include <QThread>
 #include <string>
 
+#include "MyThread.h"
 #include "QtGameClient.h"
 #include "QtNetGame.h"
 #include "QtPlayer.h"
 #include "mainwindow.h"
-#include "MyThread.h"
 #include "qbrush.h"
 #include "qevent.h"
 #include "qpainter.h"

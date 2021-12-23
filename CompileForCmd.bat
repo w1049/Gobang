@@ -1,0 +1,1 @@
+g++ AIPlayer.cpp ChessPad.cpp ChessPiece.cpp CmdGame.cpp CmdPlayer.cpp Game.cpp Player.cpp CmdMain.cpp

@@ -17,6 +17,7 @@ using namespace AI;
 using std::array;
 
 AIPlayer::AIPlayer(int p) : Player(p, 0), r(1), depth(7) {}
+// AI的参数可以修改，但我懒得加文本框，就做成固定值了
 ChessPiece AIPlayer::getNextPiece(const ChessPad& oriChessPad) {
     ChessPiece maxP;
     ChessPad chessPad(oriChessPad);  // 复制一份
