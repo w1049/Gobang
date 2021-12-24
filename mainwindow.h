@@ -24,7 +24,11 @@ private slots:
     void on_serverButton_clicked();
     void on_clientButton_clicked();
 
+protected:
+    void resizeEvent(QResizeEvent *);
+
 private:
+    int orientation = 0;
     Ui::MainWindow *ui;
     void connectClient();
     void connectServer();

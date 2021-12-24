@@ -38,6 +38,7 @@ GameWindow *GW;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
+
     tcpServer = new QTcpServer(this);
     tcpSocket = new QTcpSocket(this);
     connect(tcpServer, &QTcpServer::newConnection, this,
@@ -46,6 +47,62 @@ MainWindow::MainWindow(QWidget *parent)
             &MainWindow::connectServer);
     connect(tcpSocket, &QAbstractSocket::errorOccurred, this,
             &MainWindow::displayError);
+}
+
+void MainWindow::resizeEvent(QResizeEvent *) {
+    if (width() < height() && orientation == 0) { // 0 means l to r
+        orientation = 1; // change to up to down
+
+        ui->mainLayout->removeItem(ui->localLayout);
+        ui->mainLayout->removeItem(ui->op1Layout);
+        ui->mainLayout->removeItem(ui->op2Layout);
+        ui->mainLayout->removeItem(ui->horizontalSpacer);
+        ui->mainLayout->removeItem(ui->serverLayout);
+        ui->mainLayout->removeItem(ui->verticalSpacer);
+
+        ui->serverLayout->removeWidget(ui->hostLineEdit);
+        ui->serverLayout->removeWidget(ui->portLineEdit);
+        ui->serverLayout->removeWidget(ui->serverButton);
+        ui->serverLayout->removeWidget(ui->clientButton);
+        ui->serverLayout->addWidget(ui->hostLineEdit, 0, 0, 1, 3);
+        ui->serverLayout->addWidget(ui->portLineEdit, 1, 0, 1, 1);
+        ui->serverLayout->addWidget(ui->serverButton, 1, 1, 1, 1);
+        ui->serverLayout->addWidget(ui->clientButton, 1, 2, 1, 1);
+        ui->serverLayout->setColumnStretch(0, 1);
+
+        ui->mainLayout->addLayout(ui->localLayout, 0, 0, 2, 1);
+        ui->mainLayout->addLayout(ui->op1Layout, 2, 0, 1, 1);
+        ui->mainLayout->addLayout(ui->op2Layout, 3, 0, 1, 1);
+        ui->mainLayout->addItem(ui->horizontalSpacer, 1, 1, 1, 1);
+        ui->mainLayout->addLayout(ui->serverLayout, 4, 0, 1, 2);
+        ui->mainLayout->addItem(ui->verticalSpacer, 5, 0, 1, 1);
+    } else if (width() > height() && orientation == 1) { // 1 means up to down
+        orientation = 0;
+
+        ui->mainLayout->removeItem(ui->localLayout);
+        ui->mainLayout->removeItem(ui->op1Layout);
+        ui->mainLayout->removeItem(ui->op2Layout);
+        ui->mainLayout->removeItem(ui->horizontalSpacer);
+        ui->mainLayout->removeItem(ui->serverLayout);
+        ui->mainLayout->removeItem(ui->verticalSpacer);
+
+        ui->serverLayout->removeWidget(ui->hostLineEdit);
+        ui->serverLayout->removeWidget(ui->portLineEdit);
+        ui->serverLayout->removeWidget(ui->serverButton);
+        ui->serverLayout->removeWidget(ui->clientButton);
+        ui->serverLayout->addWidget(ui->hostLineEdit, 0, 0, 1, 1);
+        ui->serverLayout->addWidget(ui->portLineEdit, 0, 1, 1, 1);
+        ui->serverLayout->addWidget(ui->serverButton, 0, 2, 1, 1);
+        ui->serverLayout->addWidget(ui->clientButton, 0, 3, 1, 1);
+        ui->serverLayout->setColumnStretch(0, 3);
+
+        ui->mainLayout->addLayout(ui->localLayout, 0, 0, 2, 1);
+        ui->mainLayout->addLayout(ui->op1Layout, 0, 1, 1, 1);
+        ui->mainLayout->addLayout(ui->op2Layout, 1, 1, 1, 1);
+        ui->mainLayout->addItem(ui->horizontalSpacer, 1, 2, 1, 1);
+        ui->mainLayout->addLayout(ui->serverLayout, 2, 0, 1, 2);
+        ui->mainLayout->addItem(ui->verticalSpacer, 3, 0, 1, 1);
+    }
 }
 
 MainWindow::~MainWindow() { delete ui; }

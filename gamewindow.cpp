@@ -46,7 +46,238 @@ int undo1, undo2;
 }  // namespace GameServer
 using namespace GameServer;
 
+namespace paint {
+    int prex, prey;
+    double ratio;
+}
+using namespace paint;
+
 extern MainWindow *MW;
+
+
+GameWindow::GameWindow(int type, bool mode, QWidget *parent)
+    : QWidget(parent), ui(new Ui::GameWindow), type(type), mode(mode) {
+    ui->setupUi(this);
+    // ui->gridLayout->removeItem(ui->horizontalSpacer);
+    if (type < 6) init();
+}
+
+void GameWindow::resizeEvent(QResizeEvent *) {
+    if (width() < height() && orientation == 0) { // 0 means l to r
+        orientation = 1; // change to up to down
+        ui->gridLayout->removeWidget(ui->statusLabel);
+        ui->gridLayout->removeWidget(ui->scoresLabel);
+        ui->gridLayout->removeWidget(ui->startButton);
+        ui->gridLayout->removeWidget(ui->undoButton);
+        ui->gridLayout->removeWidget(ui->aiButton);
+        ui->gridLayout->removeItem(ui->aiLayout);
+        ui->gridLayout->removeItem(ui->verticalSpacer);
+        ui->gridLayout->addWidget(ui->statusLabel, 0, 0, 1, 1);
+        ui->gridLayout->addWidget(ui->scoresLabel, 0, 1, 1, 1);
+        ui->gridLayout->addWidget(ui->startButton, 0, 2, 1, 1);
+        ui->gridLayout->addWidget(ui->undoButton, 0, 3, 1, 1);
+        ui->gridLayout->addWidget(ui->aiButton, 0, 4, 1, 1);
+        ui->gridLayout->addLayout(ui->aiLayout, 0, 5, 1, 1);
+
+        ui->mainLayout->removeItem(ui->gridLayout);
+        ui->mainLayout->addLayout(ui->gridLayout, 1, 0, 1, 1);
+    } else if (width() > height() && orientation == 1) { // 1 means up to down
+        orientation = 0;
+        ui->gridLayout->removeWidget(ui->statusLabel);
+        ui->gridLayout->removeWidget(ui->scoresLabel);
+        ui->gridLayout->removeWidget(ui->startButton);
+        ui->gridLayout->removeWidget(ui->undoButton);
+        ui->gridLayout->removeWidget(ui->aiButton);
+        ui->gridLayout->removeItem(ui->aiLayout);
+        ui->gridLayout->addItem(ui->verticalSpacer, 6, 0, 1, 1);
+        ui->gridLayout->addWidget(ui->statusLabel, 0, 0, 1, 1);
+        ui->gridLayout->addWidget(ui->scoresLabel, 1, 0, 1, 1);
+        ui->gridLayout->addWidget(ui->startButton, 2, 0, 1, 1);
+        ui->gridLayout->addWidget(ui->undoButton, 3, 0, 1, 1);
+        ui->gridLayout->addWidget(ui->aiButton, 4, 0, 1, 1);
+        ui->gridLayout->addLayout(ui->aiLayout, 5, 0, 1, 1);
+
+        ui->mainLayout->removeItem(ui->gridLayout);
+        ui->mainLayout->addLayout(ui->gridLayout, 0, 1, 1, 1);
+    }
+}
+
+void GameWindow::init() {
+    if (type < 6) {
+        setButtonEnabled(0);
+        gameThread = new MyThread();
+        connect(gameThread, &MyThread::isDone, this, &GameWindow::dealDone);
+        connect(this, &GameWindow::destroyed, this, &GameWindow::stopThread);
+    } else {
+        ui->startButton->setDisabled(true);
+        allowAI = ai2;
+        allowUndo = undo2;
+        switch (type) {
+        case 6:  // 客机白
+            currentPid = 1;
+            currentPlayer = nullptr;
+            waitPlayer = new QtPlayer(2);
+            setButtonEnabled(0);
+            ui->statusLabel->setText("等待...");
+            break;
+        case 7:  // 客机黑
+            currentPid = 2;
+            currentPlayer = nullptr;
+            waitPlayer = new QtPlayer(1);
+            setButtonEnabled(0);
+            ui->statusLabel->setText("等待...");
+            break;
+        }
+        this->show();
+        MW->close();
+    }
+}
+
+void GameWindow::paintEvent(QPaintEvent *) {
+    QPainter painter(this);  // 画板
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    prex = ui->padLabel->x(), prey = ui->padLabel->y();
+    ratio = qMin(ui->padLabel->width(), ui->padLabel->height()) / 600.0;
+    painter.translate(prex, prey);
+    painter.scale(ratio, ratio);
+    QPen pen = painter.pen();  // 边框
+    pen.setColor(QColor(0xCD, 0x78, 0x2D));
+    pen.setWidth(5);
+    painter.setPen(pen);
+
+    QBrush brush;
+    brush.setColor(QColor(0xFF, 0xD3, 0x9B));  // 填充
+    brush.setStyle(Qt::SolidPattern);
+    painter.setBrush(brush);
+
+    painter.drawRoundedRect(0, 0, 600, 600, 15, 15);
+
+    pen.setColor(Qt::black);
+    pen.setWidth(1);
+    painter.setPen(pen);
+    for (int i = 0; i < 15; i++) {
+        painter.drawLine(20 + i * 40, 20, 20 + i * 40, 580);
+        painter.drawLine(20, 20 + i * 40, 580, 20 + i * 40);
+    }  // 棋盘线
+
+    brush.setColor(Qt::black);
+    painter.setBrush(brush);  // 黑点
+    painter.drawEllipse(135, 135, 10, 10);
+    painter.drawEllipse(455, 135, 10, 10);
+    painter.drawEllipse(135, 455, 10, 10);
+    painter.drawEllipse(455, 455, 10, 10);
+    painter.drawEllipse(295, 295, 10, 10);
+
+    if (currentPlayer && ~moveX && ~moveY)
+        drawPiece(painter, pen, brush,
+                  ChessPiece(currentPlayer->getPid(), moveX, moveY), 127);
+
+    drawmutex.lock();
+    ui->scoresLabel->setText(QString::number(points));
+    auto v = currentPad.getPiecesList();
+    if (v.size()) {  // 最后棋子的光环
+        int px = v.back().getX() * 40 + 20;
+        int py = v.back().getY() * 40 + 20;
+        QRadialGradient radialGradient(px, py, 25, px, py);
+        radialGradient.setColorAt(0.7, Qt::white);
+        radialGradient.setColorAt(1.0, QColor(255, 255, 255, 0));
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(QBrush(radialGradient));
+        painter.drawEllipse(px - 26, py - 26, 52, 52);
+        for (auto p : v) drawPiece(painter, pen, brush, p);
+    }
+    if (banned.size()) {  // 禁手
+        for (auto p : banned) drawBanned(painter, p);
+    }
+    if (win5.size()) {  // 警告
+        for (auto p : win5) drawWarn(painter, p);
+    }
+    if (rcmd.getPid()) {  // 推荐棋子
+        int px = rcmd.getX() * 40 + 20;
+        int py = rcmd.getY() * 40 + 20;
+        pen.setColor(Qt::yellow);
+        pen.setWidth(2);
+        painter.setPen(pen);
+        painter.drawLine(px - 10, py - 10, px - 5, py - 10);
+        painter.drawLine(px + 10, py - 10, px + 5, py - 10);
+        painter.drawLine(px - 10, py - 10, px - 10, py - 5);
+        painter.drawLine(px - 10, py + 10, px - 10, py + 5);
+        painter.drawLine(px + 10, py + 10, px + 5, py + 10);
+        painter.drawLine(px - 10, py + 10, px - 5, py + 10);
+        painter.drawLine(px + 10, py + 10, px + 10, py + 5);
+        painter.drawLine(px + 10, py - 10, px + 10, py - 5);
+    }
+    drawmutex.unlock();
+}
+
+void GameWindow::drawPiece(QPainter &painter, QPen &pen, QBrush &brush,
+                           const ChessPiece &p, int alpha) {
+    int c = p.getPid() == 1 ? 0 : 255;
+    brush.setColor(QColor(c, c, c, alpha));
+    pen.setColor(QColor(0, 0, 0, alpha));
+    painter.setBrush(brush);
+    painter.setPen(pen);
+    painter.drawEllipse(p.getX() * 40 + 4, p.getY() * 40 + 4, 32, 32);
+}
+
+void GameWindow::drawBanned(QPainter &painter, const ChessPiece &p) {
+    QPen pen = painter.pen();
+    pen.setColor(QColor(255, 0, 0));
+    pen.setWidth(3);
+    painter.setPen(pen);
+    painter.setBrush(Qt::NoBrush);
+    painter.drawEllipse(p.getX() * 40 + 5, p.getY() * 40 + 5, 30, 30);
+    painter.drawLine(p.getX() * 40 + 15, p.getY() * 40 + 15, p.getX() * 40 + 25,
+                     p.getY() * 40 + 25);
+    painter.drawLine(p.getX() * 40 + 15, p.getY() * 40 + 25, p.getX() * 40 + 25,
+                     p.getY() * 40 + 15);
+}
+
+void GameWindow::drawWarn(QPainter &painter, const ChessPiece &p) {
+    int px = p.getX() * 40 + 20;
+    int py = p.getY() * 40 + 20;
+    QRadialGradient radialGradient(px, py, 25, px, py);
+    radialGradient.setColorAt(0, Qt::red);
+    radialGradient.setColorAt(1.0, QColor(255, 0, 0, 0));
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(QBrush(radialGradient));
+    painter.drawEllipse(px - 26, py - 26, 52, 52);
+}
+
+void GameWindow::mouseMoveEvent(QMouseEvent *event) {
+    // qDebug() << event->position().y()  << " " << event->position().x();
+    moveX = (event->position().x() - prex) / (40 * ratio);
+    moveY = (event->position().y() - prey) / (40 * ratio);
+    // --moveX, --moveY;
+    if (!(moveX >= 0 && moveX < 15 && moveY >= 0 && moveY < 15))
+        moveX = moveY = -1;
+    update();
+}
+
+QDataStream &operator<<(QDataStream &, const ChessPiece &);
+
+void GameWindow::mouseReleaseEvent(QMouseEvent *) {
+    if (!currentPlayer) return;
+    if (runningGame) {
+        currentPlayer->mutex.lock();
+        currentPlayer->cmd = 0;
+        currentPlayer->Tx = moveX;
+        currentPlayer->Ty = moveY;
+        currentPlayer->hasCmd.wakeAll();
+        currentPlayer->mutex.unlock();
+    } else {
+        sendBlock.clear();
+        QDataStream out(&sendBlock, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_4_0);
+        out << (quint16)0;
+        out << CLICK << (int8_t)moveX << (int8_t)moveY;
+        out.device()->seek(0);
+        out << (quint16)(sendBlock.size() - sizeof(quint16));
+        tcpSocket->write(sendBlock);
+        tcpSocket->waitForBytesWritten();
+        tcpSocket->flush();
+    }
+}
 
 void GameWindow::upd(int pid) {
     if (pid && pid != currentPid) {
@@ -87,197 +318,10 @@ void GameWindow::dealDone() {
     waitPlayer = nullptr;
 }
 
-GameWindow::GameWindow(int type, bool mode, QWidget *parent)
-    : QWidget(parent), ui(new Ui::GameWindow), type(type), mode(mode) {
-    ui->setupUi(this);
-    setMouseTracking(true);
-    if (type < 6) init();
-}
-
-void GameWindow::init() {
-    if (type < 6) {
-        setButtonEnabled(0);
-        gameThread = new MyThread();
-        connect(gameThread, &MyThread::isDone, this, &GameWindow::dealDone);
-        connect(this, &GameWindow::destroyed, this, &GameWindow::stopThread);
-    } else {
-        ui->startButton->setDisabled(true);
-        allowAI = ai2;
-        allowUndo = undo2;
-        switch (type) {
-        case 6:  // 客机白
-            currentPid = 1;
-            currentPlayer = nullptr;
-            waitPlayer = new QtPlayer(2);
-            setButtonEnabled(0);
-            ui->statusLabel->setText("等待...");
-            break;
-        case 7:  // 客机黑
-            currentPid = 2;
-            currentPlayer = nullptr;
-            waitPlayer = new QtPlayer(1);
-            setButtonEnabled(0);
-            ui->statusLabel->setText("等待...");
-            break;
-        }
-        this->show();
-        MW->close();
-    }
-}
-
-void GameWindow::paintEvent(QPaintEvent *) {
-    QPainter painter(this);  // 画板
-    painter.setRenderHint(QPainter::Antialiasing, true);
-
-    QPen pen = painter.pen();  // 边框
-    pen.setColor(QColor(0xCD, 0x78, 0x2D));
-    pen.setWidth(5);
-    painter.setPen(pen);
-
-    QBrush brush;
-    brush.setColor(QColor(0xFF, 0xD3, 0x9B));  // 填充
-    brush.setStyle(Qt::SolidPattern);
-    painter.setBrush(brush);
-
-    painter.drawRoundedRect(20, 40, 600, 600, 15, 15);
-
-    pen.setColor(Qt::black);
-    pen.setWidth(1);
-    painter.setPen(pen);
-    for (int i = 0; i < 15; i++) {
-        painter.drawLine(40 + i * 40, 60, 40 + i * 40, 620);
-        painter.drawLine(40, 60 + i * 40, 600, 60 + i * 40);
-    }  // 棋盘线
-
-    brush.setColor(Qt::black);
-    painter.setBrush(brush);  // 黑点
-    painter.drawEllipse(155, 175, 10, 10);
-    painter.drawEllipse(475, 175, 10, 10);
-    painter.drawEllipse(155, 495, 10, 10);
-    painter.drawEllipse(475, 495, 10, 10);
-    painter.drawEllipse(315, 335, 10, 10);
-
-    if (currentPlayer && ~moveX && ~moveY)
-        drawPiece(painter, pen, brush,
-                  ChessPiece(currentPlayer->getPid(), moveX, moveY), 127);
-
-    drawmutex.lock();
-    ui->scoresLabel->setText(QString::number(points));
-    auto v = currentPad.getPiecesList();
-    if (v.size()) {  // 最后棋子的光环
-        int px = v.back().getX() * 40 + 40;
-        int py = v.back().getY() * 40 + 60;
-        QRadialGradient radialGradient(px, py, 25, px, py);
-        radialGradient.setColorAt(0.7, Qt::white);
-        radialGradient.setColorAt(1.0, QColor(255, 255, 255, 0));
-        painter.setPen(Qt::NoPen);
-        painter.setBrush(QBrush(radialGradient));
-        painter.drawEllipse(px - 26, py - 26, 52, 52);
-        for (auto p : v) drawPiece(painter, pen, brush, p);
-    }
-    if (banned.size()) {  // 禁手
-        for (auto p : banned) drawBanned(painter, p);
-    }
-    if (win5.size()) {  // 警告
-        for (auto p : win5) drawWarn(painter, p);
-    }
-    if (rcmd.getPid()) {  // 推荐棋子
-        int px = rcmd.getX() * 40 + 40;
-        int py = rcmd.getY() * 40 + 60;
-        pen.setColor(Qt::yellow);
-        pen.setWidth(2);
-        painter.setPen(pen);
-        painter.drawLine(px - 10, py - 10, px - 5, py - 10);
-        painter.drawLine(px + 10, py - 10, px + 5, py - 10);
-        painter.drawLine(px - 10, py - 10, px - 10, py - 5);
-        painter.drawLine(px - 10, py + 10, px - 10, py + 5);
-        painter.drawLine(px + 10, py + 10, px + 5, py + 10);
-        painter.drawLine(px - 10, py + 10, px - 5, py + 10);
-        painter.drawLine(px + 10, py + 10, px + 10, py + 5);
-        painter.drawLine(px + 10, py - 10, px + 10, py - 5);
-    }
-    drawmutex.unlock();
-}
-
-void GameWindow::drawPiece(QPainter &painter, QPen &pen, QBrush &brush,
-                           const ChessPiece &p, int alpha) {
-    int c = p.getPid() == 1 ? 0 : 255;
-    brush.setColor(QColor(c, c, c, alpha));
-    pen.setColor(QColor(0, 0, 0, alpha));
-    painter.setBrush(brush);
-    painter.setPen(pen);
-    painter.drawEllipse(p.getX() * 40 + 24, p.getY() * 40 + 44, 32, 32);
-}
-
-void GameWindow::drawBanned(QPainter &painter, const ChessPiece &p) {
-    QPen pen = painter.pen();
-    pen.setColor(QColor(255, 0, 0));
-    pen.setWidth(3);
-    painter.setPen(pen);
-    painter.setBrush(Qt::NoBrush);
-    painter.drawEllipse(p.getX() * 40 + 25, p.getY() * 40 + 45, 30, 30);
-    painter.drawLine(p.getX() * 40 + 35, p.getY() * 40 + 55, p.getX() * 40 + 45,
-                     p.getY() * 40 + 65);
-    painter.drawLine(p.getX() * 40 + 35, p.getY() * 40 + 65, p.getX() * 40 + 45,
-                     p.getY() * 40 + 55);
-}
-
-void GameWindow::drawWarn(QPainter &painter, const ChessPiece &p) {
-    int px = p.getX() * 40 + 40;
-    int py = p.getY() * 40 + 60;
-    QRadialGradient radialGradient(px, py, 25, px, py);
-    radialGradient.setColorAt(0, Qt::red);
-    radialGradient.setColorAt(1.0, QColor(255, 0, 0, 0));
-    painter.setPen(Qt::NoPen);
-    painter.setBrush(QBrush(radialGradient));
-    painter.drawEllipse(px - 26, py - 26, 52, 52);
-}
-
-void GameWindow::mouseMoveEvent(QMouseEvent *event) {
-    // qDebug() << event->position().y()  << " " << event->position().x();
-    moveY = (event->position().y()) / 40;
-    moveX = (event->position().x() + 20) / 40;
-    --moveY, --moveX;
-    if (!(moveX >= 0 && moveX < 15 && moveY >= 0 && moveY < 15))
-        moveX = moveY = -1;
-    update();
-}
-
-QDataStream &operator<<(QDataStream &, const ChessPiece &);
-
-void GameWindow::mouseReleaseEvent(QMouseEvent *) {
-    if (!currentPlayer) return;
-    if (runningGame) {
-        currentPlayer->mutex.lock();
-        currentPlayer->cmd = 0;
-        currentPlayer->Tx = moveX;
-        currentPlayer->Ty = moveY;
-        currentPlayer->hasCmd.wakeAll();
-        currentPlayer->mutex.unlock();
-    } else {
-        sendBlock.clear();
-        QDataStream out(&sendBlock, QIODevice::WriteOnly);
-        out.setVersion(QDataStream::Qt_4_0);
-        out << (quint16)0;
-        out << CLICK << (int8_t)moveX << (int8_t)moveY;
-        out.device()->seek(0);
-        out << (quint16)(sendBlock.size() - sizeof(quint16));
-        tcpSocket->write(sendBlock);
-        tcpSocket->waitForBytesWritten();
-        tcpSocket->flush();
-    }
-}
-
 void GameWindow::stopThread() {
     gameThread->quit();
     gameThread->wait();
     delete runningGame;
-}
-
-GameWindow::~GameWindow() {
-    delete ui;
-    // disconnect(gameThread, &MyThread::isDone, this, &GameWindow::dealDone);
-    disconnect(this, &GameWindow::destroyed, this, &GameWindow::stopThread);
 }
 
 void GameWindow::on_startButton_clicked() {
@@ -492,3 +536,10 @@ void GameWindow::exitDisconnected() {
     QMessageBox::critical(this, "连接失败", "无法连接，即将退出");
     close();
 }
+
+GameWindow::~GameWindow() {
+    delete ui;
+    // disconnect(gameThread, &MyThread::isDone, this, &GameWindow::dealDone);
+    disconnect(this, &GameWindow::destroyed, this, &GameWindow::stopThread);
+}
+

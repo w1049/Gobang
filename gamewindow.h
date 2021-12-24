@@ -25,6 +25,7 @@ protected:
     void paintEvent(QPaintEvent *);
     void mouseMoveEvent(QMouseEvent *);
     void mouseReleaseEvent(QMouseEvent *);
+    void resizeEvent(QResizeEvent *);
 
 private slots:
     void on_startButton_clicked();
@@ -43,6 +44,7 @@ private:
     int moveX = -1;
     int moveY = -1;
     int type, mode;
+    int orientation = 0;
     void drawPiece(QPainter &, QPen &, QBrush &, const ChessPiece &, int = 255);
     void drawBanned(QPainter &, const ChessPiece &);
     void drawWarn(QPainter &, const ChessPiece &);
