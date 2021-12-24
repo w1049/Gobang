@@ -25,8 +25,6 @@ add_executable(Gobang
     AIPlayer.cpp
     ChessPad.cpp
     ChessPiece.cpp
-    CmdGame.cpp 
-    CmdPlayer.cpp
     Game.cpp
     GameWindow.cpp
     MainWindow.cpp

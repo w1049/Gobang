@@ -74,10 +74,10 @@ void GameWindow::resizeEvent(QResizeEvent *) {
         ui->gridLayout->removeItem(ui->verticalSpacer);
         ui->gridLayout->addWidget(ui->statusLabel, 0, 0, 1, 1);
         ui->gridLayout->addWidget(ui->scoresLabel, 0, 1, 1, 1);
-        ui->gridLayout->addWidget(ui->startButton, 0, 2, 1, 1);
-        ui->gridLayout->addWidget(ui->undoButton, 0, 3, 1, 1);
-        ui->gridLayout->addWidget(ui->aiButton, 0, 4, 1, 1);
-        ui->gridLayout->addLayout(ui->aiLayout, 0, 5, 1, 1);
+        ui->gridLayout->addWidget(ui->startButton, 1, 0, 1, 1);
+        ui->gridLayout->addWidget(ui->undoButton, 1, 1, 1, 1);
+        ui->gridLayout->addWidget(ui->aiButton, 1, 2, 1, 1);
+        ui->gridLayout->addLayout(ui->aiLayout, 1, 3, 1, 1);
 
         ui->mainLayout->removeItem(ui->gridLayout);
         ui->mainLayout->addLayout(ui->gridLayout, 1, 0, 1, 1);

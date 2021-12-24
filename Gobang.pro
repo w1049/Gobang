@@ -12,8 +12,6 @@ SOURCES += \
     AIPlayer.cpp \
     ChessPad.cpp \
     ChessPiece.cpp \
-    CmdGame.cpp \
-    CmdPlayer.cpp \
     Game.cpp \
     GameWindow.cpp \
     MainWindow.cpp \
@@ -29,8 +27,6 @@ HEADERS += \
     AIPlayer.h \
     ChessPad.h \
     ChessPiece.h \
-    CmdGame.h \
-    CmdPlayer.h \
     Game.h \
     GameWindow.h \
     MainWindow.h \
@@ -50,4 +46,10 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-RC_FILE = icon.rc
+RC_FILE += \
+    icon.rc
+
+# DISTFILES += \
+#     android-sources/AndroidManifest.xml
+
+# ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android-sources
