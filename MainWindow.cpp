@@ -45,13 +45,8 @@ MainWindow::MainWindow(QWidget *parent)
             &MainWindow::connectClient);
     connect(tcpSocket, &QTcpSocket::connected, this,
             &MainWindow::connectServer);
-    connect(
-        tcpSocket,
-        static_cast<void (QAbstractSocket::*)(QAbstractSocket::SocketError)>(
-            &QAbstractSocket::error),
-        this,
-        static_cast<void (MainWindow::*)(QAbstractSocket::SocketError)>(
-            &MainWindow::displayError));
+    connect(tcpSocket, &QAbstractSocket::errorOccurred, this,
+            &MainWindow::displayError);
 }
 
 void MainWindow::resizeEvent(QResizeEvent *) {
