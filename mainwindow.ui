@@ -73,34 +73,6 @@
         </item>
        </layout>
       </item>
-      <item row="1" column="0" rowspan="2">
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <widget class="QRadioButton" name="Type_1">
-          <property name="text">
-           <string>执黑</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="Type_2">
-          <property name="text">
-           <string>执白</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="Type_3">
-          <property name="text">
-           <string>双人</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
       <item row="1" column="1">
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <item>
@@ -124,6 +96,36 @@
         <property name="text">
          <string>开始本地游戏</string>
         </property>
+       </widget>
+      </item>
+      <item row="1" column="0" rowspan="2">
+       <widget class="QWidget" name="" native="true">
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QRadioButton" name="Type_1">
+           <property name="text">
+            <string>执黑</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="Type_2">
+           <property name="text">
+            <string>执白</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="Type_3">
+           <property name="text">
+            <string>双人</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
@@ -171,25 +173,27 @@
     <item row="1" column="1">
      <layout class="QHBoxLayout" name="op2Layout">
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QRadioButton" name="Type_4">
-          <property name="text">
-           <string>主机执黑</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="Type_5">
-          <property name="text">
-           <string>主机执白</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QWidget" name="" native="true">
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QRadioButton" name="Type_4">
+           <property name="text">
+            <string>主机执黑</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="Type_5">
+           <property name="text">
+            <string>主机执白</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </item>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_5">

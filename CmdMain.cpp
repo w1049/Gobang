@@ -9,15 +9,15 @@ using std::string;
 
 int main() {
     while (1) {
-        cout << "1ï¼šäººæœº\n2ï¼šæœºäºº\nå…¶ä»–ï¼šäººäºº" << endl;
+        cout << "1£ºÈË»ú\n2£º»úÈË\nÆäËû£ºÈËÈË" << endl;
         char x = cin.get();
         cin.get();
-        cout << "0ï¼šæ— ç¦æ‰‹\n1ï¼šç¦æ‰‹" << endl;
+        cout << "0£ºÎÞ½ûÊÖ\n1£º½ûÊÖ" << endl;
         char y = cin.get();
         cin.get();
         CmdGame g(x - '0', y - '0');
         g.start(1);
-        cout << "æŒ‰å›žè½¦é”®é€€å‡ºæ¸¸æˆï¼Œæˆ–è¾“å…¥1å†æ¥ä¸€å±€" << endl;
+        cout << "°´»Ø³µ¼üÍË³öÓÎÏ·£¬»òÊäÈë1ÔÙÀ´Ò»¾Ö" << endl;
         if (cin.get() == '1')
             continue;
         else

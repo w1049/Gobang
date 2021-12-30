@@ -47,13 +47,12 @@ int undo1, undo2;
 using namespace GameServer;
 
 namespace paint {
-    int prex, prey;
-    double ratio;
-}
+int prex, prey;
+double ratio;
+}  // namespace paint
 using namespace paint;
 
 extern MainWindow *MW;
-
 
 GameWindow::GameWindow(int type, bool mode, QWidget *parent)
     : QWidget(parent), ui(new Ui::GameWindow), type(type), mode(mode) {
@@ -63,8 +62,8 @@ GameWindow::GameWindow(int type, bool mode, QWidget *parent)
 }
 
 void GameWindow::resizeEvent(QResizeEvent *) {
-    if (width() < height() && orientation == 0) { // 0 means l to r
-        orientation = 1; // change to up to down
+    if (width() < height() && orientation == 0) {  // 0 means l to r
+        orientation = 1;                           // change to up to down
         ui->gridLayout->removeWidget(ui->statusLabel);
         ui->gridLayout->removeWidget(ui->scoresLabel);
         ui->gridLayout->removeWidget(ui->startButton);
@@ -81,7 +80,7 @@ void GameWindow::resizeEvent(QResizeEvent *) {
 
         ui->mainLayout->removeItem(ui->gridLayout);
         ui->mainLayout->addLayout(ui->gridLayout, 1, 0, 1, 1);
-    } else if (width() > height() && orientation == 1) { // 1 means up to down
+    } else if (width() > height() && orientation == 1) {  // 1 means up to down
         orientation = 0;
         ui->gridLayout->removeWidget(ui->statusLabel);
         ui->gridLayout->removeWidget(ui->scoresLabel);
@@ -542,4 +541,3 @@ GameWindow::~GameWindow() {
     // disconnect(gameThread, &MyThread::isDone, this, &GameWindow::dealDone);
     disconnect(this, &GameWindow::destroyed, this, &GameWindow::stopThread);
 }
-

@@ -33,7 +33,7 @@ void CmdGame::infoRecommend(const ChessPiece& p) {
 }
 
 void CmdGame::infoTips(int pid) {
-    cout << "å½“å‰å±€åŠ¿ï¼š" << -AI::g(3 - turn, *chessPad) << endl;
+    cout << "µ±Ç°¾ÖÊÆ£º" << -AI::g(3 - turn, *chessPad) << endl;
     ChessPiece p;
     cpv banned, win5;
     for (int8_t x = 0; x < 15; x++)
@@ -48,13 +48,13 @@ void CmdGame::infoTips(int pid) {
                 win5.push_back(p);
         }
     if (!banned.empty()) {
-        cout << "è­¦å‘Šï¼šç¦æ‰‹ç‚¹ ";
+        cout << "¾¯¸æ£º½ûÊÖµã ";
         for (auto p : banned)
             cout << char(p.getY() + 'A') << (int)p.getX() + 1 << " ";
         cout << endl;
     }
     if (!win5.empty()) {
-        cout << "è­¦å‘Šï¼šæˆäº”ç‚¹ ";
+        cout << "¾¯¸æ£º³ÉÎåµã ";
         for (auto p : win5)
             cout << char(p.getY() + 'A') << (int)p.getX() + 1 << " ";
         cout << endl;
@@ -62,22 +62,22 @@ void CmdGame::infoTips(int pid) {
 }
 
 void CmdGame::infoGameOver(int pid) {
-    cout << (pid == 1 ? "â—" : "â—‹");
+    cout << (pid == 1 ? "¡ñ" : "¡ð");
     if (p[pid - 1]->getType() == 0) {
-        cout << "ç”µè„‘èµ¢äº†ï¼" << endl;
+        cout << "µçÄÔÓ®ÁË£¡" << endl;
     } else {
-        cout << "çŽ©å®¶" << (int)pid << "èµ¢äº†! " << endl;
+        cout << "Íæ¼Ò" << (int)pid << "Ó®ÁË! " << endl;
     }
 
-}  // æç¤ºæ¸¸æˆç»“æŸï¼Œå±•ç¤ºèƒœè€…æˆ–å¹³å±€
+}  // ÌáÊ¾ÓÎÏ·½áÊø£¬Õ¹Ê¾Ê¤Õß»òÆ½¾Ö
 
 const char* toS(int x) {
     if (x == 0)
         return "++ ";
     else if (x == 1)
-        return "â— ";
+        return "¡ñ ";
     else
-        return "â—‹ ";
+        return "¡ð ";
 }
 
 void CmdGame::infoPlace(const ChessPiece& p) {

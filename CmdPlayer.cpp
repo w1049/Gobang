@@ -14,16 +14,16 @@ ChessPiece CmdPlayer::getNextPiece(const ChessPad&) {
 }
 
 void CmdPlayer::infoFailed(const ChessPiece& p, int reason) {
-    cout << "ç”±äºŽåŽŸå› " << reason << ", ä½ ä¸èƒ½åœ¨" << char(p.getY() + 'A')
-         << (int)p.getX() + 1 << "ä¸‹æ£‹." << endl;
+    cout << "ÓÉÓÚÔ­Òò" << reason << ", Äã²»ÄÜÔÚ" << char(p.getY() + 'A')
+         << (int)p.getX() + 1 << "ÏÂÆå." << endl;
 }
 
 int CmdPlayer::command(const ChessPad& pad) {
     ChessPiece p;
     int8_t reason;
     while (1) {
-        cout << "è½®åˆ°" << (pid == 1 ? "â—" : "â—‹")
-             << "æ–¹ä¸‹æ£‹ã€‚è¯·è¾“å…¥åæ ‡ï¼Œå½¢å¼ä¸ºâ€œA8â€ï¼ˆä¸å«å¼•å·ï¼‰: " << endl;
+        cout << "ÂÖµ½" << (pid == 1 ? "¡ñ" : "¡ð")
+             << "·½ÏÂÆå¡£ÇëÊäÈë×ø±ê£¬ÐÎÊ½Îª¡°A8¡±£¨²»º¬ÒýºÅ£©: " << endl;
         char cy;
         int x;
         std::string str;
