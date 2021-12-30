@@ -245,8 +245,8 @@ void GameWindow::drawWarn(QPainter &painter, const ChessPiece &p) {
 
 void GameWindow::mouseMoveEvent(QMouseEvent *event) {
     // qDebug() << event->position().y()  << " " << event->position().x();
-    moveX = (event->position().x() - prex) / (40 * ratio);
-    moveY = (event->position().y() - prey) / (40 * ratio);
+    moveX = (event->x() - prex) / (40 * ratio);
+    moveY = (event->y() - prey) / (40 * ratio);
     // --moveX, --moveY;
     if (!(moveX >= 0 && moveX < 15 && moveY >= 0 && moveY < 15))
         moveX = moveY = -1;
