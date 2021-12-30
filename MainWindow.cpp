@@ -50,8 +50,8 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 void MainWindow::resizeEvent(QResizeEvent *) {
-    if (width() < height() && orientation == 0) { // 0 means l to r
-        orientation = 1; // change to up to down
+    if (width() < height() && orientation == 0) {  // 0 means l to r
+        orientation = 1;                           // change to up to down
 
         ui->mainLayout->removeItem(ui->localLayout);
         ui->mainLayout->removeItem(ui->op1Layout);
@@ -76,7 +76,7 @@ void MainWindow::resizeEvent(QResizeEvent *) {
         ui->mainLayout->addItem(ui->horizontalSpacer, 1, 1, 1, 1);
         ui->mainLayout->addLayout(ui->serverLayout, 4, 0, 1, 2);
         ui->mainLayout->addItem(ui->verticalSpacer, 5, 0, 1, 1);
-    } else if (width() > height() && orientation == 1) { // 1 means up to down
+    } else if (width() > height() && orientation == 1) {  // 1 means up to down
         orientation = 0;
 
         ui->mainLayout->removeItem(ui->localLayout);

@@ -70,21 +70,21 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
+     <item row="3" column="0">
       <widget class="QPushButton" name="undoButton">
        <property name="text">
         <string>悔棋</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
+     <item row="4" column="0">
       <widget class="QPushButton" name="aiButton">
        <property name="text">
         <string>AI辅助</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
+     <item row="2" column="0">
       <widget class="QPushButton" name="startButton">
        <property name="text">
         <string>开始游戏</string>
